@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>로우리트 임팩트 원장 — UI 목업 v0.2</title>
+<title>로우리트 임팩트 원장</title>
 <style>
   :root{
     --ink:#16261f; --ink2:#4a5c53; --line:#e3e0d6; --bg:#f6f4ee; --card:#ffffff;
@@ -13,20 +13,19 @@
   *{margin:0;padding:0;box-sizing:border-box}
   body{font-family:-apple-system,'Apple SD Gothic Neo','Noto Sans CJK KR','Noto Sans KR','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55}
   .app{display:flex;min-height:100vh}
-  /* sidebar */
   .side{width:224px;background:var(--green);color:#e9f2ec;padding:20px 14px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
-  .logo{font-weight:800;font-size:15px;letter-spacing:.02em;margin-bottom:2px}
+  .logo{font-weight:800;font-size:15px;letter-spacing:.02em;margin-bottom:2px;cursor:pointer}
   .logo span{color:var(--lime)}
   .tagline{font-size:11px;opacity:.55;margin-bottom:18px}
   .nav-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;opacity:.5;margin:14px 8px 6px}
   .nav a{display:block;padding:7px 10px;border-radius:8px;color:#cfe0d5;text-decoration:none;font-size:12.5px;margin-bottom:2px;cursor:pointer}
   .nav a:hover{background:rgba(255,255,255,.08)}
   .nav a.on{background:rgba(215,233,107,.16);color:#fff;font-weight:700}
-  .nav a .b{display:inline-block;font-size:9px;background:var(--lime);color:var(--green);border-radius:99px;padding:1px 6px;margin-left:5px;font-weight:800;vertical-align:1px}
-  .side .foot{margin-top:22px;font-size:10px;opacity:.55;line-height:1.7}
-  /* main */
+  .side .foot{margin-top:22px;font-size:10.5px;opacity:.7;line-height:1.8}
+  .side .foot a{color:#cfe0d5;cursor:pointer;text-decoration:underline}
   .main{flex:1;padding:22px 28px 60px;max-width:1120px}
-  .mockbar{background:#fff8e6;border:1px dashed var(--amber);color:#7a5b12;font-size:12px;padding:7px 12px;border-radius:8px;margin-bottom:18px}
+  .statusbar{display:none;background:#fff8e6;border:1px dashed var(--amber);color:#7a5b12;font-size:12px;padding:7px 12px;border-radius:8px;margin-bottom:18px}
+  .statusbar.show{display:block}
   .screen{display:none}.screen.on{display:block}
   .htitle{display:flex;align-items:baseline;gap:10px;margin-bottom:4px;flex-wrap:wrap}
   h1{font-size:20px;font-weight:800}
@@ -40,17 +39,14 @@
   .kpi .val{font-size:25px;font-weight:800;letter-spacing:-.02em;margin:2px 0}
   .kpi .val small{font-size:12px;font-weight:600;color:var(--ink2)}
   .kpi .d{font-size:11px;color:var(--ink2)}
-  .kpi .d b.up{color:var(--green2)}
   .ctitle{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
   .ctitle .more{font-size:11px;color:var(--ink2);font-weight:500}
-  /* bar chart */
   .bars{display:flex;align-items:flex-end;gap:7px;height:120px;padding-top:6px}
   .bar{flex:1;background:linear-gradient(180deg,var(--mint),var(--green2));border-radius:4px 4px 0 0;position:relative;min-width:10px}
   .bar.mut{background:#dfe6dd}
   .bar i{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-style:normal;font-size:9px;color:var(--ink2);white-space:nowrap}
   .xlab{display:flex;gap:7px;margin-top:6px}
   .xlab span{flex:1;text-align:center;font-size:9.5px;color:var(--ink2)}
-  /* stacked material */
   .stack{display:flex;height:14px;border-radius:99px;overflow:hidden;margin:10px 0 8px}
   .leg{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--ink2)}
   .dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px}
@@ -59,11 +55,11 @@
   td{padding:8px;border-bottom:1px solid #efede5;vertical-align:middle}
   tr:last-child td{border-bottom:none}
   .num{font-family:var(--mono);font-size:12px}
-  .avatar{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--green2);color:#fff;font-size:10px;font-weight:700;align-items:center;justify-content:center;margin-right:7px}
   .btn{display:inline-block;background:var(--green);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer}
   .btn.o{background:#fff;color:var(--green);border:1.5px solid var(--green)}
   .btn.s{padding:5px 10px;font-size:11.5px;border-radius:6px}
-  /* form */
+  .btn.r{background:#fff;color:var(--red);border:1.5px solid var(--red)}
+  .btn:disabled{opacity:.5;cursor:default}
   .frow{margin-bottom:13px}
   label{display:block;font-size:11.5px;font-weight:700;margin-bottom:5px;color:var(--ink2)}
   label em{color:var(--red);font-style:normal}
@@ -71,9 +67,7 @@
   .seg{display:flex;gap:6px;flex-wrap:wrap}
   .seg span{border:1.5px solid var(--line);border-radius:8px;padding:7px 12px;font-size:12.5px;cursor:pointer;background:#fff}
   .seg span.on{background:var(--green);color:#fff;border-color:var(--green);font-weight:700}
-  .photo{border:1.5px dashed #c9c4b4;border-radius:10px;padding:16px;text-align:center;color:var(--ink2);font-size:12px;background:#faf9f5}
   .hint{font-size:10.5px;color:#8b8676;margin-top:4px}
-  /* partner public page */
   .pub{background:linear-gradient(160deg,#1d3a2f 0%,#2c5743 70%);border-radius:16px;color:#eef6f0;padding:28px;position:relative;overflow:hidden}
   .pub:after{content:"";position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(215,233,107,.12)}
   .pub .pn{font-size:22px;font-weight:800}
@@ -104,7 +98,6 @@
     border:6px solid #fff;outline:1px solid var(--line);border-radius:4px}
   .prog{height:8px;background:#e8e5da;border-radius:99px;overflow:hidden;margin:6px 0 4px}
   .prog i{display:block;height:100%;background:linear-gradient(90deg,var(--mint),var(--green2));border-radius:99px}
-  /* v0.2 additions */
   .selbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .selbar select{width:auto;padding:7px 12px;font-weight:700;font-size:13px}
   .selbar .lab2{font-size:11.5px;font-weight:700;color:var(--ink2)}
@@ -123,285 +116,61 @@
   .big{font-size:26px;font-weight:800;color:var(--green2);letter-spacing:-.02em}
   .calcrow{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
   .calcrow .frow{margin-bottom:0;flex:1;min-width:130px}
+  /* 모달 */
+  .modalbg{display:none;position:fixed;inset:0;background:rgba(22,38,31,.5);z-index:50;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
+  .modalbg.show{display:flex}
+  .modal{background:#fff;border-radius:14px;padding:22px;width:100%;max-width:460px}
+  .modal h3{font-size:15px;margin-bottom:14px}
+  /* 인쇄 */
+  #printArea{display:none}
+  @media print{
+    .app,.modalbg{display:none!important}
+    #printArea{display:block;padding:20px}
+    body{background:#fff}
+  }
   @media(max-width:900px){.g4,.g3,.pubgrid,.two,.tiers{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}.side{display:none}}
 </style>
 </head>
 <body>
 <div class="app">
   <aside class="side">
-    <div class="logo">LOWLIT <span>Impact Ledger</span></div>
+    <div class="logo" id="logoBtn">LOWLIT <span>Impact Ledger</span></div>
     <div class="tagline">티끌 플라스틱 임팩트 원장</div>
-    <nav class="nav">
-      <div class="nav-label">① 내부 관리 · 🔒 @lowlit.co</div>
-      <a class="on" data-s="dash">📊 대시보드</a>
-      <a data-s="intake">➕ 입고 등록</a>
-      <a data-s="ledger">📒 입고 원장</a>
-      <a data-s="report">📅 월간·연간 리포트</a>
-      <a data-s="docs">📄 문서 발급</a>
-      <div class="nav-label">② 파트너 공개</div>
-      <a data-s="pickers">🌱 티끌피커스 소개 🌐</a>
-      <a data-s="apply">✍️ 피커스 신청 🌐</a>
-      <a data-s="partner">🏪 파트너 임팩트 🔗</a>
-      <a data-s="qr">🔍 제품 QR 스토리 🌐</a>
-      <a data-s="method">🧮 산정 방법론 🌐</a>
-      <div class="nav-label">③ 기업 B2B</div>
-      <a data-s="campaign">🏢 캠페인 리포트 🔗</a>
-      <a data-s="rental">🛋️ 렌탈·제작 안내 🌐</a>
-    </nav>
+    <nav class="nav" id="nav"></nav>
     <div class="foot">
-      <div id="authbox" style="margin-bottom:10px">⚪ 내부 화면은 로그인 필요</div>
-      🔒 내부 전용 (@lowlit.co)<br>🔗 전용 링크로만 열람<br>🌐 누구나 열람 (오픈)<br><br>
-      UI Mockup v0.2 · 2026.07<br>데이터는 예시입니다
+      <div id="authbox"><a id="adminLink">관리자 로그인</a></div>
+      <div style="margin-top:10px;opacity:.7">© LOWLIT COLLECTIVE<br>business@lowlit.co</div>
     </div>
   </aside>
 
   <main class="main">
-    <div class="mockbar">⚠️ 목업 v0.2 — 수치·파트너명 일부는 실제 원장 데이터 기반 예시값. 좌측 메뉴로 화면 전환 · 🔒 내부 / 🔗 전용 링크 / 🌐 오픈 페이지 구분</div>
+    <div class="statusbar" id="statusbar"></div>
 
-    <!-- ============ 대시보드 ============ -->
-    <section class="screen on" id="dash">
-      <div class="htitle"><h1>대시보드</h1><span class="chip g">2026년 7월</span><span class="chip y">🔒 내부 전용</span></div>
-      <div class="sub">원장 전체 현황 — 모든 수치는 입고 로트에서 자동 집계됩니다.</div>
-      <div class="grid g4" style="margin-bottom:14px">
-        <div class="card kpi"><div class="lab">누적 수거량</div><div class="val">4,812<small> kg</small></div><div class="d">2021.05 이후 · 로트 1,047건</div></div>
-        <div class="card kpi"><div class="lab">누적 제품화 사용량</div><div class="val">3,994<small> kg</small></div><div class="d">수율 83% 적용 · 잔여 재고 818kg</div></div>
-        <div class="card kpi"><div class="lab">탄소 감축 기여량 (보수)</div><div class="val">3,102<small> kgCO₂e</small></div><div class="d">표준 시나리오 4,517 · <b>계수 v2.0</b></div></div>
-        <div class="card kpi"><div class="lab">검증 가능 kg 비율 ★</div><div class="val">64<small> %</small></div><div class="prog"><i style="width:64%"></i></div><div class="d">신규 입고분 <b class="up">100%</b> · 활성 파트너 18/52</div></div>
-      </div>
-      <div class="grid g2" style="margin-bottom:14px">
-        <div class="card">
-          <div class="ctitle">월별 입고량 (kg) <span class="more">최근 12개월</span></div>
-          <div class="bars">
-            <div class="bar mut" style="height:38%"><i>72</i></div><div class="bar mut" style="height:22%"><i>41</i></div>
-            <div class="bar mut" style="height:55%"><i>104</i></div><div class="bar mut" style="height:47%"><i>89</i></div>
-            <div class="bar mut" style="height:30%"><i>57</i></div><div class="bar mut" style="height:65%"><i>123</i></div>
-            <div class="bar" style="height:52%"><i>98</i></div><div class="bar" style="height:78%"><i>148</i></div>
-            <div class="bar" style="height:60%"><i>113</i></div><div class="bar" style="height:44%"><i>83</i></div>
-            <div class="bar" style="height:88%"><i>167</i></div><div class="bar" style="height:70%"><i>132</i></div>
-          </div>
-          <div class="xlab"><span>8월</span><span>9월</span><span>10월</span><span>11월</span><span>12월</span><span>1월</span><span>2월</span><span>3월</span><span>4월</span><span>5월</span><span>6월</span><span>7월</span></div>
-        </div>
-        <div class="card">
-          <div class="ctitle">재질 구성 (누적)</div>
-          <div class="stack">
-            <span style="flex:58;background:#2c5743"></span><span style="flex:27;background:#6fcf97"></span><span style="flex:9;background:#d7e96b"></span><span style="flex:6;background:#c9c4b4"></span>
-          </div>
-          <div class="leg">
-            <span><i class="dot" style="background:#2c5743"></i>PE/LDPE 58%</span>
-            <span><i class="dot" style="background:#6fcf97"></i>PP 27%</span>
-            <span><i class="dot" style="background:#d7e96b"></i>HDPE 9%</span>
-            <span><i class="dot" style="background:#c9c4b4"></i>PLA·기타 6%</span>
-          </div>
-          <div class="note">PLA는 감축량 산정에서 제외되고 kg만 집계됩니다.</div>
-          <div class="ctitle" style="margin-top:16px">이번 달 수율</div>
-          <div class="kpi"><div class="val">83<small> %</small></div><div class="d">투입 132kg → 산출 109.6kg (배치 3건)</div></div>
-        </div>
-      </div>
-      <div class="grid g2">
-        <div class="card">
-          <div class="ctitle">파트너 순위 <span class="more">누적 기증량</span></div>
-          <table>
-            <tr><th>파트너</th><th>속성</th><th style="text-align:right">누적 kg</th><th style="text-align:right">최근 기증</th></tr>
-            <tr><td><span class="avatar">알</span>알맹상점</td><td><span class="chip g">제로웨이스트샵</span></td><td class="num" style="text-align:right">1,842.3</td><td class="num" style="text-align:right">07-14</td></tr>
-            <tr><td><span class="avatar">이</span>이웃집약국</td><td><span class="chip b">사기업</span></td><td class="num" style="text-align:right">612.4</td><td class="num" style="text-align:right">07-08</td></tr>
-            <tr><td><span class="avatar">서</span>서울환경운동연합</td><td><span class="chip g">환경단체</span></td><td class="num" style="text-align:right">470.0</td><td class="num" style="text-align:right">2021</td></tr>
-            <tr><td><span class="avatar">춘</span>춘천지역자활센터</td><td><span class="chip y">사회복지기관</span></td><td class="num" style="text-align:right">390.0</td><td class="num" style="text-align:right">03-26</td></tr>
-            <tr><td><span class="avatar">작</span>작은발걸음</td><td><span class="chip g">제로웨이스트샵</span></td><td class="num" style="text-align:right">99.2</td><td class="num" style="text-align:right">05-30</td></tr>
-          </table>
-        </div>
-        <div class="card">
-          <div class="ctitle">데이터 품질 알림 <span class="chip y">3건</span></div>
-          <table>
-            <tr><td>⚠️ L-260712-002 사진 누락</td><td style="text-align:right"><button class="btn s o">보완</button></td></tr>
-            <tr><td>⚠️ L-260709-001 중량 급증 (평균 대비 4.2배)</td><td style="text-align:right"><button class="btn s o">확인</button></td></tr>
-            <tr><td>⚠️ 6월 공정 전력량 미입력</td><td style="text-align:right"><button class="btn s o">입력</button></td></tr>
-          </table>
-          <div class="note">CleanHub식 자동 플래깅 — 이상값·증빙 누락을 잡아 '검증 가능 kg 비율'을 지킵니다.</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ 입고 등록 ============ -->
-    <section class="screen" id="intake">
-      <div class="htitle"><h1>입고 등록</h1><span class="chip g">30초 목표</span><span class="chip y">🔒 내부 전용</span></div>
-      <div class="sub">현장(모바일) 입력 폼 — 필수 7개 필드. 저장 시 로트ID가 자동 채번되고 기증확인서를 바로 발급할 수 있습니다.</div>
-      <div class="two">
-        <div class="card" style="max-width:430px">
-          <div class="frow"><label>파트너 <em>*</em></label>
-            <select><option>알맹상점 (제로웨이스트샵)</option><option>이웃집약국 (사기업)</option><option>+ 신규 파트너 등록</option></select></div>
-          <div class="frow"><label>재질 <em>*</em></label>
-            <div class="seg"><span class="on">PE/LDPE</span><span>PP</span><span>HDPE</span><span>PLA</span><span>기타</span></div></div>
-          <div class="frow"><label>형태</label>
-            <div class="seg"><span class="on">병뚜껑</span><span>용기</span><span>기타</span></div></div>
-          <div class="frow"><label>중량 (kg) <em>*</em></label><input type="text" value="12.4" class="num"></div>
-          <div class="frow"><label>계량 방법 <em>*</em></label>
-            <div class="seg"><span class="on">자체 저울</span><span>계근표</span><span>추정</span></div></div>
-          <div class="frow"><label>전달 방법 <em>*</em></label>
-            <div class="seg"><span class="on">차량 수거</span><span>택배</span><span>직접 전달</span></div>
-            <div class="hint">차량 수거 시 거리(km)가 자동 기록됩니다 — 운송 배출 차감용</div></div>
-          <div class="frow"><label>증빙 사진 <em>*</em></label>
-            <div class="photo">📷 저울 위 중량이 보이게 촬영<br><span class="hint">촬영 시각·위치 자동 기록</span></div></div>
-          <div class="frow"><label>캠페인 귀속 (해당 시)</label>
-            <select><option>일반 (귀속 없음)</option><option>○○전자 임직원 캠페인 (C-2607)</option></select></div>
-          <button class="btn" style="width:100%">저장 → 로트 L-260721-001 생성</button>
-        </div>
-        <div>
-          <div class="card" style="margin-bottom:14px">
-            <div class="ctitle">저장 시 자동으로 일어나는 일</div>
-            <div class="flow">
-              <span class="n">로트ID 채번</span><span class="a">→</span>
-              <span class="n">파트너 누적 갱신</span><span class="a">→</span>
-              <span class="n">증빙 연결</span><span class="a">→</span>
-              <span class="n">이상값 검사</span><span class="a">→</span>
-              <span class="n">기증확인서 발급 가능</span>
-            </div>
-            <div class="note">환산값(CO₂e·병뚜껑 개수)은 저장하지 않습니다. 원장에는 물리량(kg)만 남고, 환산은 리포트 생성 시 계수 테이블(버전 관리)을 참조해 계산됩니다.</div>
-          </div>
-          <div class="card">
-            <div class="ctitle">방금 등록된 로트</div>
-            <table>
-              <tr><th>로트ID</th><th>파트너</th><th>재질</th><th style="text-align:right">kg</th><th>증빙</th></tr>
-              <tr><td class="num">L-260714-003</td><td>알맹상점</td><td>PE</td><td class="num" style="text-align:right">35.0</td><td>📷 ✓</td></tr>
-              <tr><td class="num">L-260714-002</td><td>이웃집약국</td><td>PP</td><td class="num" style="text-align:right">8.2</td><td>📷 ✓</td></tr>
-              <tr><td class="num">L-260712-002</td><td>알맹상점</td><td>PE</td><td class="num" style="text-align:right">21.6</td><td><span class="chip r">누락</span></td></tr>
-            </table>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ 입고 원장 ============ -->
-    <section class="screen" id="ledger">
-      <div class="htitle"><h1>입고 원장</h1><span class="chip g">1,047 로트</span><span class="chip y">🔒 내부 전용</span></div>
-      <div class="sub">모든 수치의 원천 — 로트 → 배치 → 제품으로 이어지는 추적 그래프의 시작점.</div>
-      <div class="card">
-        <div class="ctitle">
-          <span>2026년 7월 <span class="chip g">132.2 kg</span></span>
-          <span class="more">필터: 전체 재질 ▾ · 전체 파트너 ▾ · <b>증빙 있음만 ☑</b></span>
-        </div>
-        <table>
-          <tr><th>로트ID</th><th>입고일</th><th>파트너</th><th>재질</th><th style="text-align:right">kg</th><th>계량</th><th>전달</th><th>증빙</th><th>귀속</th><th>상태</th></tr>
-          <tr><td class="num">L-260714-003</td><td class="num">07-14</td><td>알맹상점</td><td>PE</td><td class="num" style="text-align:right">35.00</td><td>자체저울</td><td>차량 4.2km</td><td>📷 🧾</td><td>일반</td><td><span class="chip g">배치 투입됨</span></td></tr>
-          <tr><td class="num">L-260714-002</td><td class="num">07-14</td><td>이웃집약국</td><td>PP</td><td class="num" style="text-align:right">8.20</td><td>자체저울</td><td>택배</td><td>📷</td><td>일반</td><td><span class="chip g">재고</span></td></tr>
-          <tr><td class="num">L-260712-002</td><td class="num">07-12</td><td>알맹상점</td><td>PE</td><td class="num" style="text-align:right">21.60</td><td>자체저울</td><td>차량 4.2km</td><td><span class="chip r">사진 누락</span></td><td>일반</td><td><span class="chip y">보완 필요</span></td></tr>
-          <tr><td class="num">L-260709-001</td><td class="num">07-09</td><td>○○전자 판교캠퍼스</td><td>PP</td><td class="num" style="text-align:right">48.70</td><td>계근표</td><td>차량 18.5km</td><td>📷 🧾 ⚖️</td><td><span class="chip b">C-2607</span></td><td><span class="chip g">재고</span></td></tr>
-          <tr><td class="num">L-260708-001</td><td class="num">07-08</td><td>이웃집약국</td><td>PP+HDPE</td><td class="num" style="text-align:right">10.00</td><td>자체저울</td><td>차량 6.1km</td><td>📷</td><td>일반</td><td><span class="chip g">재고</span></td></tr>
-          <tr><td class="num">L-260703-001</td><td class="num">07-03</td><td>지구공감</td><td>PE</td><td class="num" style="text-align:right">6.83</td><td>자체저울</td><td>택배</td><td>📷</td><td>일반</td><td><span class="chip g">배치 투입됨</span></td></tr>
-          <tr><td class="num">L-230105-004</td><td class="num">23-01-05</td><td>알맹상점</td><td>PE</td><td class="num" style="text-align:right">47.83</td><td><span class="chip y">과거기록</span></td><td>차량</td><td>—</td><td>일반</td><td><span class="chip y">증빙없음(과거)</span></td></tr>
-        </table>
-        <div class="note">과거 이관분(2021~2025)은 <b>계량방법=과거기록</b> 태그로 분리 — 대외 검증 주장은 증빙 있는 신규분에 한정합니다.</div>
-      </div>
-    </section>
-
-    <!-- ============ 월간·연간 리포트 (NEW) ============ -->
-    <section class="screen" id="report">
-      <div class="htitle"><h1>월간·연간 리포트</h1><span class="chip y">🔒 내부 전용</span></div>
-      <div class="sub">연도와 월을 선택하면 해당 기간의 재활용량이 원장에서 자동 집계됩니다. 월을 "전체"로 두면 연간 리포트가 됩니다.</div>
-      <div class="card selbar" style="padding:12px 16px;margin-bottom:14px">
-        <span class="lab2">기간 선택</span>
-        <select id="ry">
-          <option>2021</option><option>2022</option><option>2023</option><option>2024</option><option>2025</option><option selected>2026</option>
-        </select>
-        <select id="rm">
-          <option value="all" selected>전체 (연간)</option>
-          <option value="0">1월</option><option value="1">2월</option><option value="2">3월</option><option value="3">4월</option>
-          <option value="4">5월</option><option value="5">6월</option><option value="6">7월</option><option value="7">8월</option>
-          <option value="8">9월</option><option value="9">10월</option><option value="10">11월</option><option value="11">12월</option>
-        </select>
-        <span class="chip g" id="rlabel">2026년 연간</span>
-        <span class="more" style="margin-left:auto">내보내기: <b>PDF</b> · <b>XLSX</b></span>
-      </div>
-      <div class="grid g4" style="margin-bottom:14px">
-        <div class="card kpi"><div class="lab">수거량</div><div class="val" id="rk1">—</div><div class="d" id="rd1"></div></div>
-        <div class="card kpi"><div class="lab">제품화 투입량</div><div class="val" id="rk2">—</div><div class="d">수율 83% 적용 (배치 실측)</div></div>
-        <div class="card kpi"><div class="lab">탄소 감축 기여량</div><div class="val" id="rk3">—</div><div class="d">보수 시나리오 · 계수 v2.0</div></div>
-        <div class="card kpi"><div class="lab">병뚜껑 환산</div><div class="val" id="rk4">—</div><div class="d">kg × 400개 (개당 2.5g)</div></div>
-      </div>
-      <div class="card" style="margin-bottom:14px">
-        <div class="ctitle">월별 추이 <span class="more">월을 선택하면 해당 월만 진하게 표시됩니다</span></div>
-        <div class="bars" id="rbars"></div>
-        <div class="xlab" id="rx"></div>
-      </div>
-      <div class="grid g3">
-        <div class="card kpi"><div class="lab">누적 수거량 (2021.05~)</div><div class="val">4,812<small> kg</small></div><div class="d">로트 1,047건 · 파트너 52곳</div></div>
-        <div class="card kpi"><div class="lab">누적 제품화 사용량</div><div class="val">3,994<small> kg</small></div><div class="d">제품·자재로 순환 완료된 양</div></div>
-        <div class="card kpi"><div class="lab">누적 탄소 감축 기여량</div><div class="val">3,102<small> kgCO₂e</small></div><div class="d">보수 기준 · 표준 4,517 병기</div></div>
-      </div>
-      <div class="note">이 덱의 숫자는 SVI·사업보고서·연간 임팩트 리포트 집계표의 원천으로 그대로 내보내기 됩니다. 2026년은 7월까지 집계된 값입니다.</div>
-    </section>
-
-    <!-- ============ 문서 발급 ============ -->
-    <section class="screen" id="docs">
-      <div class="htitle"><h1>문서 발급</h1><span class="chip g">발급 대장 연동</span><span class="chip y">🔒 내부 전용</span></div>
-      <div class="sub">기증확인서·파트너 인증서를 원장에서 자동 생성 — 모든 문서에 고유 일련번호가 붙고 발급 대장에 기록됩니다.</div>
-      <div class="two">
-        <div class="cert">
-          <div class="serial">No. LWL-DC-2026-0412</div>
-          <h2>기 증 확 인 서</h2>
-          <div class="sub2">CERTIFICATE OF DONATION</div>
-          <dl>
-            <dt>기증자</dt><dd><b>알맹상점</b> (제로웨이스트샵) · 담당 ○○○</dd>
-            <dt>수거 일시</dt><dd>2026년 7월 14일 14:20 · 차량 수거</dd>
-            <dt>수거 장소</dt><dd>서울 마포구 월드컵로 49 (GPS 기록)</dd>
-            <dt>품목</dt><dd>PE 병뚜껑 (post-consumer, 오염도 하)</dd>
-            <dt>중량</dt><dd><b>35.00 kg</b> — 자체 저울 실측 (사진 증빙 2매)</dd>
-            <dt>연결 로트</dt><dd class="num">L-260714-003</dd>
-          </dl>
-          <div style="font-size:11.5px;color:var(--ink2)">위 폐플라스틱이 로우리트콜렉티브에 기증되어 자원순환 공정에 투입되었음을 확인합니다.</div>
-          <div class="stamp">
-            <div>인계자 (서명) ______<br>인수자 (서명) ______</div>
-            <div style="text-align:right">2026. 07. 14.<br><b>로우리트콜렉티브 주식회사</b></div>
-            <div class="seal">LOWLIT<br>COLLECTIVE</div>
-          </div>
-        </div>
-        <div>
-          <div class="card" style="margin-bottom:14px">
-            <div class="ctitle">발급 유형</div>
-            <table>
-              <tr><td><b>기증확인서</b><br><span class="hint">로트 단위 / 기간 합산</span></td><td style="text-align:right"><button class="btn s">발급</button></td></tr>
-              <tr><td><b>파트너 월간·연간 인증서</b><br><span class="hint">누적 kg + 탄소 감축 기여량 + 방법론 각주</span></td><td style="text-align:right"><button class="btn s">발급</button></td></tr>
-              <tr><td><b>캠페인 리포트</b><br><span class="hint">기업 ESG팀 제출용 패키지</span></td><td style="text-align:right"><button class="btn s o">Phase 3</button></td></tr>
-              <tr><td><b>연간 임팩트 리포트 / SVI·사업보고서 집계표</b></td><td style="text-align:right"><button class="btn s o">생성</button></td></tr>
-            </table>
-          </div>
-          <div class="card">
-            <div class="ctitle">최근 발급 대장</div>
-            <table>
-              <tr><th>번호</th><th>유형</th><th>수신</th><th>발급일</th></tr>
-              <tr><td class="num">LWL-DC-2026-0412</td><td>기증확인서</td><td>알맹상점</td><td class="num">07-14</td></tr>
-              <tr><td class="num">LWL-PC-2026-06-018</td><td>월간 인증서</td><td>이웃집약국</td><td class="num">07-02</td></tr>
-              <tr><td class="num">LWL-DC-2026-0411</td><td>기증확인서</td><td>춘천지역자활센터</td><td class="num">06-28</td></tr>
-            </table>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ 티끌피커스 소개 (NEW) ============ -->
+    <!-- ═══════════ 공개: 티끌피커스 소개 ═══════════ -->
     <section class="screen" id="pickers">
-      <div class="htitle"><h1>티끌피커스, 다시 시작합니다</h1><span class="chip b">🌐 오픈 페이지</span></div>
-      <div class="sub">동네 가게·기관이 티끌 플라스틱의 수거 거점이 되는 로우리트의 파트너 프로그램 — 시즌 2로 돌아왔습니다.</div>
+      <div class="htitle"><h1>티끌피커스</h1><span class="chip g">파트너 프로그램</span></div>
+      <div class="sub">동네 가게·기관이 티끌 플라스틱의 수거 거점이 되는 로우리트의 파트너 프로그램입니다.</div>
       <div class="pub" style="margin-bottom:14px">
         <div class="pn">우리 공간이 자원순환의 거점이 됩니다</div>
-        <div class="pt">2021년부터 제로웨이스트샵·환경단체·학교·기업 52곳이 함께했습니다</div>
+        <div class="pt">2021년부터 제로웨이스트샵·환경단체·학교·기업이 함께하고 있습니다</div>
         <div class="pubgrid">
-          <div class="pubk"><div class="v">52곳</div><div class="l">함께한 티끌피커스</div></div>
-          <div class="pubk"><div class="v">4,812 kg</div><div class="l">함께 모은 티끌 플라스틱</div></div>
-          <div class="pubk"><div class="v">3,102 kgCO₂e</div><div class="l">함께 줄인 탄소*</div></div>
+          <div class="pubk"><div class="v" id="hero1">52곳</div><div class="l">함께한 티끌피커스</div></div>
+          <div class="pubk"><div class="v" id="hero2">4,812 kg</div><div class="l">함께 모은 티끌 플라스틱</div></div>
+          <div class="pubk"><div class="v" id="hero3">3,102 kgCO₂e</div><div class="l">함께 줄인 탄소*</div></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:6px">
           <button class="btn s" style="background:var(--lime);color:var(--green)" onclick="go('apply')">피커스 신청하기 →</button>
-          <button class="btn s" style="background:rgba(255,255,255,.15);color:#fff">수거 가이드 보기</button>
+          <button class="btn s" style="background:rgba(255,255,255,.15);color:#fff" onclick="go('impact')">파트너 페이지 예시 보기</button>
         </div>
-        <div class="foot-note">* 새 플라스틱(신재) 원료 대비 줄어든 배출량 · 산정 방법론 v2.0 공개</div>
+        <div class="foot-note">* 새 플라스틱(신재) 원료 대비 줄어든 배출량 · 산정 방법론 공개</div>
       </div>
-      <div class="two" style="margin-bottom:14px">
+      <div class="two">
         <div class="card">
           <div class="ctitle">피커스가 되면</div>
           <table>
-            <tr><td>🔗 <b>전용 임팩트 링크</b><br><span class="hint">우리 가게의 누적 기증량·탄소 감축 기여량을 실시간 확인하고 SNS에 공유</span></td></tr>
+            <tr><td>🔗 <b>전용 임팩트 페이지</b><br><span class="hint">우리 가게의 누적 기증량·탄소 감축 기여량을 실시간 확인하고 SNS에 공유</span></td></tr>
             <tr><td>📄 <b>기증확인서 + 월간·연간 인증서</b><br><span class="hint">기관 ESG 활동 증빙으로 활용 가능 (고유 일련번호)</span></td></tr>
-            <tr><td>🎁 <b>제품 특별 납품가 · 프로모션 우선 참여</b><br><span class="hint">파트너 전용 혜택</span></td></tr>
+            <tr><td>🎁 <b>제품 특별 납품가 · 프로모션 우선 참여</b></td></tr>
             <tr><td>📦 <b>수거 가이드 + 스타터 키트</b><br><span class="hint">분류 가이드, 안내물, 수거함</span></td></tr>
           </table>
         </div>
@@ -412,48 +181,35 @@
             <span class="n">2. 승인·키트 발송</span><span class="a">→</span>
             <span class="n">3. 수거함 운영</span><span class="a">→</span>
             <span class="n">4. 기증 (택배·차량)</span><span class="a">→</span>
-            <span class="n">5. 임팩트 링크 확인</span>
+            <span class="n">5. 임팩트 페이지 확인</span>
           </div>
           <div class="note">모집 대상: 제로웨이스트샵, 환경단체, 교육기관, 사회복지기관, 카페·약국 등 오프라인 공간 운영자 누구나 · 참여 비용 없음</div>
-          <div class="note">수거 품목: 병뚜껑 등 PE·PP 소형 티끌 플라스틱 (상세 가이드 제공)</div>
+          <div class="note">수거 품목: 병뚜껑 등 PE·PP 소형 티끌 플라스틱 (승인 시 상세 가이드 제공)</div>
         </div>
-      </div>
-      <div class="card">
-        <div class="ctitle">기존 피커스 안내 메시지 (발송용 초안) <span class="more">복사해서 문자·인스타 DM으로 발송</span></div>
-        <div class="msg">안녕하세요, 로우리트콜렉티브입니다 🌿
-그동안 티끌 플라스틱을 함께 모아주신 티끌피커스 여러분 덕분에, 지금까지 4.8톤의 플라스틱이 새 쓰임을 찾았습니다.
-
-티끌피커스가 새 단장을 하고 돌아왔어요.
-이제 파트너별 전용 페이지에서 우리 가게의 누적 기증량, 탄소 감축 기여량, 병뚜껑 환산 개수를 언제든 확인하고 SNS에 공유하실 수 있습니다. 월간·연간 인증서도 페이지에서 바로 받아보실 수 있어요.
-
-👉 내 임팩트 확인하기: lowlit-impact.vercel.app/p/(파트너ID)
-👉 다시 함께하기 (재등록): lowlit-impact.vercel.app/apply
-
-앞으로도 500년 순환의 여정, 함께해 주세요.
-— 로우리트콜렉티브 드림</div>
       </div>
     </section>
 
-    <!-- ============ 피커스 신청 (NEW) ============ -->
+    <!-- ═══════════ 공개: 피커스 신청 ═══════════ -->
     <section class="screen" id="apply">
-      <div class="htitle"><h1>티끌피커스 신청</h1><span class="chip b">🌐 누구나 신청 가능</span></div>
+      <div class="htitle"><h1>티끌피커스 신청</h1></div>
       <div class="sub">작성은 3분이면 충분해요 — 검토 후 3영업일 안에 연락드립니다.</div>
       <div class="two">
         <div class="card" style="max-width:430px">
-          <div class="frow"><label>공간(기관) 이름 <em>*</em></label><input type="text" placeholder="예: 알맹상점"></div>
+          <div class="frow"><label>공간(기관) 이름 <em>*</em></label><input id="apName" placeholder="예: 알맹상점"></div>
           <div class="frow"><label>속성 <em>*</em></label>
-            <div class="seg"><span class="on">제로웨이스트샵</span><span>환경단체</span><span>교육기관</span><span>사회복지기관</span><span>사기업</span><span>기타</span></div></div>
-          <div class="frow"><label>담당자 이름 <em>*</em></label><input type="text"></div>
-          <div class="frow"><label>연락처 <em>*</em></label><input type="text" placeholder="010-0000-0000"></div>
-          <div class="frow"><label>이메일</label><input type="text" placeholder="인증서·임팩트 링크를 받아볼 주소"></div>
-          <div class="frow"><label>공간 주소 <em>*</em></label><input type="text" placeholder="수거 방문·키트 발송지"></div>
+            <div class="seg" id="apType"><span class="on">제로웨이스트샵</span><span>환경단체</span><span>교육기관</span><span>사회복지기관</span><span>사기업</span><span>기타</span></div></div>
+          <div class="frow"><label>담당자 이름 <em>*</em></label><input id="apPerson"></div>
+          <div class="frow"><label>연락처 <em>*</em></label><input id="apPhone" placeholder="010-0000-0000"></div>
+          <div class="frow"><label>이메일</label><input id="apEmail" placeholder="인증서·임팩트 링크를 받아볼 주소"></div>
+          <div class="frow"><label>공간 주소 <em>*</em></label><input id="apAddr" placeholder="수거 방문·키트 발송지"></div>
           <div class="frow"><label>예상 월 수거량</label>
-            <div class="seg"><span>5kg 미만</span><span class="on">5~20kg</span><span>20~50kg</span><span>50kg 이상</span></div></div>
+            <div class="seg" id="apAmt"><span>5kg 미만</span><span class="on">5~20kg</span><span>20~50kg</span><span>50kg 이상</span></div></div>
           <div class="frow"><label>선호 전달 방법</label>
-            <div class="seg"><span class="on">택배</span><span>차량 수거 희망</span><span>직접 전달</span></div></div>
-          <div class="frow"><label>하고 싶은 말</label><textarea rows="3" placeholder="공간 소개, 궁금한 점 등"></textarea></div>
-          <div class="frow"><label style="display:flex;gap:6px;align-items:center;font-weight:600"><input type="checkbox" style="width:auto" checked> 개인정보 수집·이용에 동의합니다 <em>*</em></label></div>
-          <button class="btn" style="width:100%">신청하기</button>
+            <div class="seg" id="apDeliv"><span class="on">택배</span><span>차량 수거 희망</span><span>직접 전달</span></div></div>
+          <div class="frow"><label>하고 싶은 말</label><textarea id="apMemo" rows="3" placeholder="공간 소개, 궁금한 점 등"></textarea></div>
+          <div class="frow"><label style="display:flex;gap:6px;align-items:center;font-weight:600"><input type="checkbox" id="apAgree" style="width:auto"> 개인정보 수집·이용에 동의합니다 <em>*</em></label></div>
+          <button class="btn" style="width:100%" id="apSubmit">신청하기</button>
+          <div class="hint" id="apMsg" style="margin-top:8px"></div>
         </div>
         <div>
           <div class="card" style="margin-bottom:14px">
@@ -462,9 +218,8 @@
               <span class="n">신청 접수</span><span class="a">→</span>
               <span class="n">검토·승인 (3영업일)</span><span class="a">→</span>
               <span class="n">스타터 키트 발송</span><span class="a">→</span>
-              <span class="n">전용 임팩트 링크 발급</span>
+              <span class="n">전용 임팩트 페이지 발급</span>
             </div>
-            <div class="note">승인과 동시에 파트너 전용 페이지(lowlit-impact.vercel.app/p/○○○)가 만들어지고, 첫 기증부터 실적이 자동으로 쌓입니다.</div>
           </div>
           <div class="card">
             <div class="ctitle">자주 묻는 질문</div>
@@ -479,31 +234,29 @@
       </div>
     </section>
 
-    <!-- ============ 파트너 임팩트 페이지 ============ -->
+    <!-- ═══════════ 파트너 임팩트 (실제 /p/슬러그 + 예시 겸용) ═══════════ -->
     <section class="screen" id="partner">
-      <div class="htitle"><h1>파트너 임팩트 페이지</h1><span class="chip b">🔗 파트너별 전용 링크</span></div>
-      <div class="sub">파트너마다 고유 URL 1개 — lowlit-impact.vercel.app/p/<b>almang</b> · 링크만 있으면 로그인 없이 열람. 파트너가 SNS·매장에서 직접 공유하는 채널이 됩니다.</div>
+      <div class="htitle"><h1 id="ptTitle">파트너 임팩트</h1><span class="chip g" id="ptDemoChip" style="display:none">예시 화면</span></div>
+      <div class="sub" id="ptSub"></div>
       <div class="pub" style="margin-bottom:14px">
-        <div class="pn">알맹상점 × 티끌피커스</div>
-        <div class="pt">2021년 5월부터 함께한 자원순환 파트너 · 제로웨이스트샵 · 서울 마포</div>
+        <div class="pn" id="ptName">—</div>
+        <div class="pt" id="ptMeta"></div>
         <div class="pubgrid">
-          <div class="pubk"><div class="v">1,842 kg</div><div class="l">누적 기증량</div></div>
-          <div class="pubk"><div class="v">1,187 kgCO₂e</div><div class="l">탄소 감축 기여량*</div></div>
-          <div class="pubk"><div class="v">736,920개</div><div class="l">병뚜껑 환산 (kg×400)</div></div>
+          <div class="pubk"><div class="v" id="ptTotal">—</div><div class="l">누적 기증량</div></div>
+          <div class="pubk"><div class="v" id="ptCo2">—</div><div class="l">탄소 감축 기여량*</div></div>
+          <div class="pubk"><div class="v" id="ptCaps">—</div><div class="l">병뚜껑 환산 (kg×400)</div></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:6px">
-          <button class="btn s" style="background:var(--lime);color:var(--green)">이미지로 공유</button>
-          <button class="btn s" style="background:rgba(255,255,255,.15);color:#fff">월간 인증서 받기</button>
+          <button class="btn s" style="background:var(--lime);color:var(--green)" onclick="window.print()">인쇄 / PDF 저장</button>
+          <button class="btn s" style="background:rgba(255,255,255,.15);color:#fff" id="ptCertBtn">월간 인증서 받기</button>
         </div>
-        <div class="foot-note">* 새 플라스틱(신재)으로 만들 때와 비교해 함께 줄인 탄소량 (회피배출량 · 보수 기준) · 산정 방법론 v2.0 공개 · 최근 기증 2026.07.14</div>
+        <div class="foot-note" id="ptFoot">* 새 플라스틱(신재)으로 만들 때와 비교해 함께 줄인 탄소량 (보수 기준) · 산정 방법론 공개</div>
       </div>
-      <div class="card" style="margin-bottom:14px">
+      <div class="card">
         <div class="ctitle">
           <span class="selbar">
             <span class="lab2">기간별 보기</span>
-            <select id="py">
-              <option>2021</option><option>2022</option><option>2023</option><option>2024</option><option>2025</option><option selected>2026</option>
-            </select>
+            <select id="py"></select>
             <select id="pm">
               <option value="all" selected>전체 (연간)</option>
               <option value="0">1월</option><option value="1">2월</option><option value="2">3월</option><option value="3">4월</option>
@@ -511,7 +264,7 @@
               <option value="8">9월</option><option value="9">10월</option><option value="10">11월</option><option value="11">12월</option>
             </select>
           </span>
-          <span class="chip g" id="plabel">2026년 연간</span>
+          <span class="chip g" id="plabel"></span>
         </div>
         <div class="grid g3" style="margin-bottom:14px">
           <div class="kpi"><div class="lab">기증량</div><div class="val" id="pk1">—</div></div>
@@ -521,13 +274,12 @@
         <div class="bars" id="pbars"></div>
         <div class="xlab" id="px"></div>
       </div>
-      <div class="note">하단에 "이 파트너의 플라스틱으로 만들어진 제품" 섹션이 붙습니다 → 제품 QR 스토리와 상호 연결. (Plastic Bank 패턴)</div>
     </section>
 
-    <!-- ============ 제품 QR 스토리 ============ -->
-    <section class="screen" id="qr">
-      <div class="htitle"><h1>제품 QR 스토리</h1><span class="chip b">🌐 QR 스캔으로 접속</span></div>
-      <div class="sub">개인 구매자가 제품의 QR을 스캔하면 나오는 페이지 — 로트→배치→제품 추적 그래프가 그대로 스토리가 됩니다.</div>
+    <!-- ═══════════ 공개: 제품 스토리 (예시) ═══════════ -->
+    <section class="screen" id="story">
+      <div class="htitle"><h1>제품 스토리</h1><span class="chip g">예시 화면</span></div>
+      <div class="sub">제품에 붙은 QR을 스캔하면 그 제품의 여정을 볼 수 있어요.</div>
       <div class="two">
         <div class="card">
           <div style="display:flex;gap:16px;align-items:center;margin-bottom:14px">
@@ -540,7 +292,7 @@
           <div class="flow" style="margin-bottom:12px">
             <span class="n">🏪 수거 13곳</span><span class="a">→</span>
             <span class="n">🧺 분류·세척</span><span class="a">→</span>
-            <span class="n">⚙️ 분쇄 B-2605-07</span><span class="a">→</span>
+            <span class="n">⚙️ 분쇄</span><span class="a">→</span>
             <span class="n">🔥 성형</span><span class="a">→</span>
             <span class="n">🟢 이 제품</span>
           </div>
@@ -553,7 +305,6 @@
             <tr><td>이웃집약국</td><td class="num" style="text-align:right">18%</td></tr>
             <tr><td>지구공감 외 10곳</td><td class="num" style="text-align:right">41%</td></tr>
           </table>
-          <div class="note">배치 규모가 작아 <b>분리보관(segregation)</b> 방식 — "이 제품은 ○○의 플라스틱" 주장이 가능한 국내 희소 사례. 블록체인 없이 원장 감사추적으로 증명.</div>
         </div>
         <div class="card">
           <div class="ctitle">이 플라스틱의 순환 여정 <span class="chip g">현재 1회차 순환 · Tier 1</span></div>
@@ -575,28 +326,24 @@
               <div class="td">콘크리트 합성 건축자재<br>아트퍼니처 — 마지막까지 순환</div>
             </div>
           </div>
-          <div class="note">이 제품이 수명을 다하면 <b>리버스(rebirth) 프로그램</b>으로 반납할 수 있어요. 반납된 플라스틱은 상태(물성·오염도·색상) 검사를 거쳐 다음 Tier의 제품으로 다시 태어나고, 순환 횟수와 이력이 이 QR에 계속 기록됩니다 — 500년 순환 여정의 시작입니다.</div>
-          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn s">리버스 반납 신청</button>
-            <button class="btn s o" onclick="go('partner')">기여 파트너 페이지 보기</button>
-          </div>
+          <div class="note">이 제품이 수명을 다하면 <b>리버스(rebirth) 프로그램</b>으로 반납할 수 있어요. 반납된 플라스틱은 상태 검사를 거쳐 다음 Tier의 제품으로 다시 태어나고, 순환 횟수와 이력이 이 QR에 계속 기록됩니다 — 500년 순환 여정의 시작입니다.</div>
         </div>
       </div>
     </section>
 
-    <!-- ============ 방법론 ============ -->
+    <!-- ═══════════ 공개: 산정 방법론 ═══════════ -->
     <section class="screen" id="method">
-      <div class="htitle"><h1>산정 방법론 v2.0</h1><span class="chip b">🌐 공개 문서</span></div>
-      <div class="sub">계수·산식·한계를 공개합니다. 국내 업사이클 업계 최초의 방법론 공개 페이지. 공개 페이지의 "탄소 감축 기여량"은 아래 회피배출량 산식으로 계산됩니다.</div>
+      <div class="htitle"><h1>산정 방법론 v2.0</h1><span class="chip g">공개 문서</span></div>
+      <div class="sub">로우리트가 사용하는 계수·산식·한계를 공개합니다. 공개 페이지의 "탄소 감축 기여량"은 아래 산식으로 계산됩니다.</div>
       <div class="card" style="margin-bottom:14px">
         <div class="ctitle">탄소 감축 기여량(회피배출량) 산식 — 버진 원료 제품 대비</div>
         <div class="formula">탄소 감축 기여량 = Σ재질 [ 제품화kg × (EF_virgin − EF_recycled) × 대체율 0.81 ]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;− 수거·운송 배출 − 자사 공정 전력 배출<br><br>
 제품화kg = 입고kg × 수율(배치 실측, 현재 83%)</div>
-        <div class="note">제품 탄소발자국(컷오프 방식)과는 분리 관리 — 두 수치를 합산·혼용하지 않습니다. "탄소 네거티브"류 표현 금지.</div>
+        <div class="note">제품 탄소발자국과는 분리 관리하며 두 수치를 합산·혼용하지 않습니다.</div>
       </div>
       <div class="card">
-        <div class="ctitle">계수 테이블 (Factor Registry) <span class="chip g">v2.0 · 승인 2026-07</span></div>
+        <div class="ctitle">계수 테이블 (Factor Registry) <span class="chip g">v2.0 · 2026-07</span></div>
         <table class="method">
           <tr><th>재질</th><th style="text-align:right">EF 버진</th><th style="text-align:right">EF 재생</th><th style="text-align:right">순차이</th><th>출처</th><th>시나리오</th></tr>
           <tr><td>PP</td><td class="num" style="text-align:right">1.47</td><td class="num" style="text-align:right">실측 예정</td><td class="num" style="text-align:right">≈0.9</td><td>환경성적표지(KEITI)</td><td><span class="chip g">보수</span></td></tr>
@@ -607,71 +354,12 @@
           <tr><td>전력</td><td colspan="3" class="num" style="text-align:center">0.459 kgCO₂e/kWh</td><td>국가 전력 배출계수</td><td>매년 갱신</td></tr>
           <tr><td>병뚜껑 환산</td><td colspan="3" class="num" style="text-align:center">400개/kg (개당 2.5g)</td><td>자사 실측</td><td>커뮤니케이션용</td></tr>
         </table>
-        <div class="note">구방법론(×1.676 단일계수) 대비 보수 시나리오는 약 40~50% 낮게 산출됩니다 — "더 엄격한 국제 기준으로 갱신"으로 커뮤니케이션하고 과거 참고치를 병기합니다.</div>
       </div>
     </section>
 
-    <!-- ============ 캠페인 리포트 ============ -->
-    <section class="screen" id="campaign">
-      <div class="htitle"><h1>캠페인 리포트</h1><span class="chip b">🔗 캠페인별 전용 링크</span></div>
-      <div class="sub">캠페인 단위로 열람 링크를 발급합니다 — lowlit-impact.vercel.app/c/<b>C-2607</b> · 기업 ESG팀이 공시·보고·보도자료에 그대로 쓰는 리포트. 예시: ○○전자 임직원 수거 캠페인</div>
-      <div class="grid g4" style="margin-bottom:14px">
-        <div class="card kpi"><div class="lab">총 수거량</div><div class="val">312<small> kg</small></div><div class="d">목표 300kg 달성 <b class="up">104%</b></div></div>
-        <div class="card kpi"><div class="lab">탄소 감축 기여량</div><div class="val">201<small> kgCO₂e</small></div><div class="d">보수 기준 · 표준 293 병기</div></div>
-        <div class="card kpi"><div class="lab">참여 임직원</div><div class="val">438<small> 명</small></div><div class="d">참여 횟수 1,204회 · 3개 사업장</div></div>
-        <div class="card kpi"><div class="lab">제품화율</div><div class="val">78<small> %</small></div><div class="d">굿즈 키링 1,200개 제작</div></div>
-      </div>
-      <div class="two" style="margin-bottom:14px">
-        <div class="card">
-          <div class="ctitle">제출용 리포트 목차 (자동 생성)</div>
-          <table>
-            <tr><td><b>0. 표지</b> — 캠페인명 · 기간 · 발행번호(LWL-CR-…) · 발행일</td><td style="text-align:right">✓</td></tr>
-            <tr><td><b>1. 캠페인 개요</b> — 목적 · 기간 · 사업장 · 참여 대상 · 수거 품목</td><td style="text-align:right">✓</td></tr>
-            <tr><td><b>2. 참여 성과</b> — 인원·횟수, 사업장별 실적, 주차별 추이 그래프</td><td style="text-align:right">✓</td></tr>
-            <tr><td><b>3. 수거 실적</b> — 총 kg + 재질별 + <b>로트별 명세</b> (일자·kg·증빙번호)</td><td style="text-align:right">✓</td></tr>
-            <tr><td><b>4. 환경 임팩트</b> — 탄소 감축 기여량(보수/표준 병기) + 병뚜껑 환산 + <b>방법론·계수 출처 각주</b></td><td style="text-align:right">✓</td></tr>
-            <tr><td><b>5. 자원 행선지</b> — 제품화율 · 제작 제품 내역 · 잔여물 처리 경로</td><td style="text-align:right">✓</td></tr>
-            <tr><td><b>6. 증빙 패키지</b> — 현장 사진 · 기증확인서 일련번호 목록 · 계량 기록 · 인수인계 서명</td><td style="text-align:right">✓</td></tr>
-            <tr><td><b>7. 활용 가이드</b> — 공시 인용 문구 · 평가 대응 매핑 · 사내 보고용 1p 요약</td><td style="text-align:right">✓</td></tr>
-            <tr><td>8. (선택) 화폐화 가치 — K-ETS 시장가 / SCC 선택 명시</td><td style="text-align:right">○</td></tr>
-          </table>
-          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn">PDF 리포트 생성</button>
-            <button class="btn o">XLSX 데이터 명세</button>
-            <button class="btn o">열람 링크 발급</button>
-          </div>
-        </div>
-        <div>
-          <div class="card" style="margin-bottom:14px">
-            <div class="ctitle">기업이 이렇게 씁니다 (활용처)</div>
-            <table>
-              <tr><td>📗 <b>지속가능경영보고서</b><br><span class="hint">폐기물·자원순환 항목(GRI 306) 실적으로 인용 — 로트 명세가 근거 자료</span></td></tr>
-              <tr><td>📊 <b>K-ESG · 평가기관 대응</b><br><span class="hint">환경(E) 자원순환 지표 증빙 — 이중 청구 검사 결과 첨부</span></td></tr>
-              <tr><td>🏢 <b>사내 ESG 성과 보고</b><br><span class="hint">경영진 보고용 1페이지 요약 (숫자 3개 + 그래프 1개)</span></td></tr>
-              <tr><td>📰 <b>보도자료 · 사내소식</b><br><span class="hint">표준 문안 + 현장 사진 팩 제공</span></td></tr>
-            </table>
-          </div>
-          <div class="card">
-            <div class="ctitle">이중 청구 검사 <span class="chip g">통과</span></div>
-            <table>
-              <tr><td>캠페인 귀속 로트 9건 — 타 캠페인 중복</td><td style="text-align:right"><span class="chip g">없음</span></td></tr>
-              <tr><td>EPR 실적 중복 청구</td><td style="text-align:right"><span class="chip g">없음</span></td></tr>
-              <tr><td>플라스틱 크레딧 귀속</td><td style="text-align:right"><span class="chip g">해당 없음</span></td></tr>
-            </table>
-            <div class="note">같은 kg은 하나의 주체에만 귀속 — 리포트 발행 전 자동 검사. 대기업 감사 대응의 핵심.</div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="ctitle">공시 인용 표준 문안 (리포트에 포함)</div>
-        <div class="msg">당사는 2026년 6~7월 로우리트콜렉티브와 함께한 임직원 자원순환 캠페인을 통해 폐플라스틱 312kg을 수거·재자원화하였으며, 이를 통해 약 201kgCO₂e(보수 기준, 표준 기준 293kgCO₂e)의 탄소 감축에 기여하였습니다.
-※ 산정: 로우리트 임팩트 원장 산정 방법론 v2.0 (계수 출처 공개) · 검증 가능 로트 기준 · 이중 청구 없음 확인 (리포트 No. LWL-CR-2607-001)</div>
-      </div>
-    </section>
-
-    <!-- ============ 렌탈·제작 안내 (NEW) ============ -->
+    <!-- ═══════════ 공개: 렌탈·제작 안내 ═══════════ -->
     <section class="screen" id="rental">
-      <div class="htitle"><h1>렌탈·제작 안내</h1><span class="chip b">🌐 오픈 페이지</span></div>
+      <div class="htitle"><h1>렌탈·제작 안내</h1><span class="chip g">기업·공간</span></div>
       <div class="sub">기업·공간을 위한 재생 플라스틱 가구와 굿즈 — 신재 대신 재생 원료를 쓸 때 줄어드는 탄소를 바로 확인하세요.</div>
       <div class="card" style="margin-bottom:14px">
         <div class="ctitle">진행 프로세스</div>
@@ -683,7 +371,7 @@
           <span class="n">5. 납품·설치</span><span class="a">→</span>
           <span class="n">6. (렌탈) 회수 → 리버스 순환</span>
         </div>
-        <div class="note">자사 캠페인에서 수거한 플라스틱으로 제작하는 <b>수거 연계 제작</b>도 가능합니다 — "우리 직원들이 모은 플라스틱으로 만든 라운지 가구".</div>
+        <div class="note">자사 캠페인에서 수거한 플라스틱으로 제작하는 <b>수거 연계 제작</b>도 가능합니다 — "우리 직원들이 모은 플라스틱으로 만든 라운지 가구". 문의: business@lowlit.co</div>
       </div>
       <div class="two" style="margin-bottom:14px">
         <div class="card">
@@ -715,7 +403,7 @@
               <option value="hdpe">HDPE</option>
             </select></div>
           <div class="frow"><label>재생 원료 사용량 (kg)</label><input type="number" id="ckg" value="100" min="1"></div>
-          <div class="frow" style="flex:0"><button class="btn" onclick="calc()">계산</button></div>
+          <div class="frow" style="flex:0"><button class="btn" id="calcBtn">계산</button></div>
         </div>
         <div class="cmp">
           <div class="row"><span class="rl">신재로 만들 때</span><div class="bl" id="cb1" style="width:72%"></div><span class="num" id="cv1"></span></div>
@@ -730,10 +418,238 @@
       </div>
     </section>
 
-    <!-- ============ 로그인 게이트 (내부 전용) ============ -->
+    <!-- ═══════════ 캠페인 리포트 (/c/아이디) ═══════════ -->
+    <section class="screen" id="campaign">
+      <div class="htitle"><h1 id="cpTitle">캠페인 리포트</h1><span class="chip b" id="cpId"></span></div>
+      <div class="sub" id="cpSub"></div>
+      <div class="grid g4" style="margin-bottom:14px">
+        <div class="card kpi"><div class="lab">총 수거량</div><div class="val" id="ck1">—</div><div class="d" id="cd1"></div></div>
+        <div class="card kpi"><div class="lab">탄소 감축 기여량</div><div class="val" id="ck2">—</div><div class="d">보수 기준 · 방법론 v2.0</div></div>
+        <div class="card kpi"><div class="lab">참여 인원</div><div class="val" id="ck3">—</div><div class="d" id="cd3"></div></div>
+        <div class="card kpi"><div class="lab">병뚜껑 환산</div><div class="val" id="ck4">—</div><div class="d">kg × 400개</div></div>
+      </div>
+      <div class="two" style="margin-bottom:14px">
+        <div class="card">
+          <div class="ctitle">리포트 구성</div>
+          <table>
+            <tr><td><b>1. 캠페인 개요</b> — 목적 · 기간 · 사업장 · 참여 대상 · 수거 품목</td></tr>
+            <tr><td><b>2. 참여 성과</b> — 인원·횟수, 사업장별 실적</td></tr>
+            <tr><td><b>3. 수거 실적</b> — 총 kg + 재질별 + 로트별 명세 (일자·kg·증빙번호)</td></tr>
+            <tr><td><b>4. 환경 임팩트</b> — 탄소 감축 기여량 + 병뚜껑 환산 + 방법론·계수 출처 각주</td></tr>
+            <tr><td><b>5. 자원 행선지</b> — 제품화율 · 제작 제품 내역 · 잔여물 처리 경로</td></tr>
+            <tr><td><b>6. 증빙 패키지</b> — 현장 사진 · 기증확인서 일련번호 · 계량 기록</td></tr>
+            <tr><td><b>7. 활용 가이드</b> — 공시 인용 문구 · 사내 보고용 요약</td></tr>
+          </table>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn" onclick="window.print()">인쇄 / PDF 저장</button>
+            <button class="btn o" id="cpCsvBtn">CSV 내보내기 (엑셀)</button>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="ctitle">캠페인 귀속 로트 명세</div>
+            <div style="max-height:220px;overflow-y:auto"><table id="cpLots"><tr><th>일자</th><th>재질</th><th style="text-align:right">kg</th></tr></table></div>
+          </div>
+          <div class="card">
+            <div class="ctitle">이중 청구 확인</div>
+            <div class="note">이 캠페인에 귀속된 수거량은 다른 캠페인·실적에 중복 계상되지 않았음을 확인합니다. (같은 kg은 하나의 주체에만 귀속)</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ctitle">공시 인용 표준 문안</div>
+        <div class="msg" id="cpQuote"></div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 관리자: 대시보드 ═══════════ -->
+    <section class="screen" id="admin/dash">
+      <div class="htitle"><h1>대시보드</h1><span class="chip y">🔒 내부 전용</span></div>
+      <div class="sub">모든 수치는 입고 원장에서 자동 집계됩니다.</div>
+      <div class="grid g4" style="margin-bottom:14px">
+        <div class="card kpi"><div class="lab">누적 수거량</div><div class="val" id="dk1">—</div><div class="d" id="dd1"></div></div>
+        <div class="card kpi"><div class="lab">누적 제품화 사용량</div><div class="val" id="dk2">—</div><div class="d">수율 83% 적용</div></div>
+        <div class="card kpi"><div class="lab">탄소 감축 기여량 (보수)</div><div class="val" id="dk3">—</div><div class="d">계수 v2.0</div></div>
+        <div class="card kpi"><div class="lab">증빙(사진) 보유 비율</div><div class="val" id="dk4">—</div><div class="prog"><i id="dk4bar" style="width:0%"></i></div></div>
+      </div>
+      <div class="grid g2" style="margin-bottom:14px">
+        <div class="card">
+          <div class="ctitle">월별 입고량 (kg) <span class="more" id="dbarsLabel"></span></div>
+          <div class="bars" id="dbars"></div>
+          <div class="xlab" id="dx"></div>
+        </div>
+        <div class="card">
+          <div class="ctitle">재질 구성 (누적)</div>
+          <div class="stack" id="dstack"></div>
+          <div class="leg" id="dleg"></div>
+          <div class="note">PLA는 감축량 산정에서 제외되고 kg만 집계됩니다.</div>
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="card">
+          <div class="ctitle">파트너 순위 <span class="more">누적 기증량</span></div>
+          <table id="dtop"><tr><th>파트너</th><th style="text-align:right">누적 kg</th><th style="text-align:right">최근 기증</th></tr></table>
+        </div>
+        <div class="card">
+          <div class="ctitle">확인 필요 <span class="chip y" id="dalertN">0건</span></div>
+          <table id="dalerts"></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 관리자: 입고 등록 ═══════════ -->
+    <section class="screen" id="admin/intake">
+      <div class="htitle"><h1>입고 등록</h1><span class="chip y">🔒 내부 전용</span></div>
+      <div class="sub">저장하면 원장에 기록되고 파트너 페이지 실적이 자동 갱신됩니다.</div>
+      <div class="two">
+        <div class="card" style="max-width:430px">
+          <div class="frow"><label>입고일 <em>*</em></label><input type="date" id="inDate"></div>
+          <div class="frow"><label>파트너 <em>*</em></label><select id="inPartner"></select>
+            <div class="hint">목록에 없으면 먼저 파트너 관리에서 등록하세요.</div></div>
+          <div class="frow"><label>재질 <em>*</em></label>
+            <div class="seg" id="inMat"><span class="on">PE/LDPE</span><span>PP</span><span>HDPE</span><span>PLA</span><span>기타</span></div></div>
+          <div class="frow"><label>형태</label>
+            <div class="seg" id="inForm"><span class="on">병뚜껑</span><span>용기</span><span>기타</span></div></div>
+          <div class="frow"><label>중량 (kg) <em>*</em></label><input type="number" step="0.01" id="inKg" class="num"></div>
+          <div class="frow"><label>계량 방법 <em>*</em></label>
+            <div class="seg" id="inWeigh"><span class="on">자체 저울</span><span>계근표</span><span>추정</span></div></div>
+          <div class="frow"><label>전달 방법 <em>*</em></label>
+            <div class="seg" id="inDeliv"><span class="on">차량 수거</span><span>택배</span><span>직접 전달</span></div></div>
+          <div class="frow"><label>증빙 사진 (구글 드라이브 링크)</label>
+            <input id="inPhoto" placeholder="드라이브에 올린 사진의 링크 붙여넣기">
+            <div class="hint">📁 <a href="https://drive.google.com/drive/folders/19_M8vwxstmCmoneRaJW9YRezLJj8_WAo" target="_blank" style="color:var(--green2)">증빙 사진 드라이브 폴더 열기</a> — 폰 드라이브 앱으로 사진 업로드 → 링크 복사 → 여기에 붙여넣기</div></div>
+          <div class="frow"><label>캠페인 귀속 (해당 시)</label><select id="inCampaign"><option value="">일반 (귀속 없음)</option></select></div>
+          <div class="frow"><label>메모</label><input id="inMemo"></div>
+          <button class="btn" style="width:100%" id="inSave">저장</button>
+          <div class="hint" id="inMsg" style="margin-top:8px"></div>
+        </div>
+        <div class="card">
+          <div class="ctitle">최근 등록된 로트</div>
+          <table id="inRecent"><tr><th>일자</th><th>파트너</th><th>재질</th><th style="text-align:right">kg</th><th>증빙</th></tr></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 관리자: 입고 원장 ═══════════ -->
+    <section class="screen" id="admin/ledger">
+      <div class="htitle"><h1>입고 원장</h1><span class="chip y">🔒 내부 전용</span></div>
+      <div class="sub">모든 수치의 원천. 행의 ✏️로 수정, 🗑로 삭제할 수 있습니다.</div>
+      <div class="card selbar" style="padding:12px 16px;margin-bottom:14px">
+        <span class="lab2">기간</span>
+        <select id="ly"></select>
+        <select id="lm">
+          <option value="all" selected>전체 (연간)</option>
+          <option value="01">1월</option><option value="02">2월</option><option value="03">3월</option><option value="04">4월</option>
+          <option value="05">5월</option><option value="06">6월</option><option value="07">7월</option><option value="08">8월</option>
+          <option value="09">9월</option><option value="10">10월</option><option value="11">11월</option><option value="12">12월</option>
+        </select>
+        <span class="lab2" style="margin-left:8px">파트너</span>
+        <select id="lp"><option value="all">전체</option></select>
+        <span class="lab2" style="margin-left:8px">재질</span>
+        <select id="lmat"><option value="all">전체</option><option>PE/LDPE</option><option>PP</option><option>HDPE</option><option>PLA</option><option>기타</option></select>
+        <label style="display:flex;align-items:center;gap:5px;margin:0 0 0 8px;font-size:12px"><input type="checkbox" id="lev" style="width:auto"> 증빙 있음만</label>
+        <span style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn s o" id="lCsvBtn">CSV 내보내기 (엑셀)</button>
+          <button class="btn s o" onclick="window.print()">인쇄 / PDF</button>
+        </span>
+      </div>
+      <div class="card">
+        <div class="ctitle"><span id="lSummary">—</span></div>
+        <div style="overflow-x:auto">
+        <table id="ltable"><tr><th>입고일</th><th>파트너</th><th>재질</th><th>형태</th><th style="text-align:right">kg</th><th>계량</th><th>전달</th><th>증빙</th><th>귀속</th><th>메모</th><th></th></tr></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 관리자: 월간·연간 리포트 ═══════════ -->
+    <section class="screen" id="admin/report">
+      <div class="htitle"><h1>월간·연간 리포트</h1><span class="chip y">🔒 내부 전용</span></div>
+      <div class="sub">연도와 월을 선택하면 해당 기간 실적이 자동 집계됩니다. 월을 "전체"로 두면 연간 리포트가 됩니다.</div>
+      <div class="card selbar" style="padding:12px 16px;margin-bottom:14px">
+        <span class="lab2">기간 선택</span>
+        <select id="ry"></select>
+        <select id="rm">
+          <option value="all" selected>전체 (연간)</option>
+          <option value="0">1월</option><option value="1">2월</option><option value="2">3월</option><option value="3">4월</option>
+          <option value="4">5월</option><option value="5">6월</option><option value="6">7월</option><option value="7">8월</option>
+          <option value="8">9월</option><option value="9">10월</option><option value="10">11월</option><option value="11">12월</option>
+        </select>
+        <span class="chip g" id="rlabel"></span>
+        <span style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn s o" id="rCsvBtn">CSV 내보내기 (엑셀)</button>
+          <button class="btn s o" onclick="window.print()">인쇄 / PDF</button>
+        </span>
+      </div>
+      <div class="grid g4" style="margin-bottom:14px">
+        <div class="card kpi"><div class="lab">수거량</div><div class="val" id="rk1">—</div><div class="d" id="rd1"></div></div>
+        <div class="card kpi"><div class="lab">제품화 투입량</div><div class="val" id="rk2">—</div><div class="d">수율 83% 적용</div></div>
+        <div class="card kpi"><div class="lab">탄소 감축 기여량</div><div class="val" id="rk3">—</div><div class="d">보수 시나리오 · 계수 v2.0</div></div>
+        <div class="card kpi"><div class="lab">병뚜껑 환산</div><div class="val" id="rk4">—</div><div class="d">kg × 400개</div></div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="ctitle">월별 추이</div>
+        <div class="bars" id="rbars"></div>
+        <div class="xlab" id="rx"></div>
+      </div>
+      <div class="grid g3">
+        <div class="card kpi"><div class="lab">누적 수거량</div><div class="val" id="rc1">—</div><div class="d" id="rc1d"></div></div>
+        <div class="card kpi"><div class="lab">누적 제품화 사용량</div><div class="val" id="rc2">—</div><div class="d">수율 83% 적용</div></div>
+        <div class="card kpi"><div class="lab">누적 탄소 감축 기여량</div><div class="val" id="rc3">—</div><div class="d">보수 기준</div></div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 관리자: 문서 발급 ═══════════ -->
+    <section class="screen" id="admin/docs">
+      <div class="htitle"><h1>문서 발급</h1><span class="chip y">🔒 내부 전용</span></div>
+      <div class="sub">원장 데이터로 문서를 만들어 인쇄하거나 PDF로 저장합니다.</div>
+      <div class="two">
+        <div class="card">
+          <div class="ctitle">기증확인서</div>
+          <div class="frow"><label>로트 선택 (최근 30건)</label><select id="dcLot"></select></div>
+          <button class="btn" id="dcMake">기증확인서 만들기 → 인쇄/PDF</button>
+        </div>
+        <div class="card">
+          <div class="ctitle">파트너 월간 인증서</div>
+          <div class="frow"><label>파트너</label><select id="mcPartner"></select></div>
+          <div class="frow"><label>대상 월</label><input type="month" id="mcMonth"></div>
+          <button class="btn" id="mcMake">월간 인증서 만들기 → 인쇄/PDF</button>
+        </div>
+      </div>
+      <div class="note" style="margin-top:14px">문서 미리보기가 인쇄 화면으로 열립니다. "PDF로 저장"을 선택하면 파일로 보관·발송할 수 있습니다.</div>
+    </section>
+
+    <!-- ═══════════ 관리자: 파트너 관리 ═══════════ -->
+    <section class="screen" id="admin/partners">
+      <div class="htitle"><h1>파트너 관리</h1><span class="chip y">🔒 내부 전용</span></div>
+      <div class="sub">파트너를 등록하면 전용 임팩트 페이지 주소가 만들어집니다. 주소를 복사해 파트너 담당자에게 전달하세요.</div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="ctitle">파트너 목록 <button class="btn s" id="paAdd">+ 새 파트너</button></div>
+        <div style="overflow-x:auto">
+        <table id="patable"><tr><th>이름</th><th>속성</th><th>전용 주소</th><th style="text-align:right">누적 kg</th><th>최근 기증</th><th></th></tr></table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ctitle">신청 접수함 <span class="chip g" id="appN">0건</span></div>
+        <table id="apptable"><tr><th>일자</th><th>공간</th><th>속성</th><th>담당자</th><th>연락처</th><th></th></tr></table>
+      </div>
+    </section>
+
+    <!-- ═══════════ 관리자: 캠페인 관리 ═══════════ -->
+    <section class="screen" id="admin/campaigns">
+      <div class="htitle"><h1>캠페인 관리</h1><span class="chip y">🔒 내부 전용</span></div>
+      <div class="sub">기업 캠페인을 등록하면 캠페인 리포트 주소가 만들어집니다. 입고 등록 시 캠페인에 귀속하면 리포트에 자동 반영됩니다.</div>
+      <div class="card">
+        <div class="ctitle">캠페인 목록 <button class="btn s" id="caAdd">+ 새 캠페인</button></div>
+        <div style="overflow-x:auto">
+        <table id="catable"><tr><th>ID</th><th>캠페인명</th><th>기업</th><th>기간</th><th style="text-align:right">수거 kg</th><th>리포트 주소</th><th></th></tr></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 로그인 ═══════════ -->
     <section class="screen" id="lock">
       <div class="htitle"><h1>내부 전용 화면</h1><span class="chip y">🔒 @lowlit.co</span></div>
-      <div class="sub">대시보드·입고·원장·리포트·문서 발급은 로우리트 구성원만 볼 수 있습니다.</div>
+      <div class="sub">이 화면은 로우리트 구성원만 볼 수 있습니다.</div>
       <div class="card" style="max-width:420px;text-align:center;padding:36px 24px">
         <div style="font-size:36px;margin-bottom:12px">🔒</div>
         <div style="font-weight:700;margin-bottom:16px">회사 Google 계정으로 로그인해 주세요</div>
@@ -742,161 +658,597 @@
       </div>
     </section>
 
+    <!-- ═══════════ 없는 페이지 ═══════════ -->
+    <section class="screen" id="notfound">
+      <div class="htitle"><h1>페이지를 찾을 수 없어요</h1></div>
+      <div class="sub">주소를 다시 확인해 주세요. 파트너·캠페인 페이지는 안내받은 전용 링크로만 접속할 수 있습니다.</div>
+      <button class="btn o" onclick="go('pickers')">티끌피커스 소개로 이동</button>
+    </section>
+
   </main>
 </div>
-<script>
-// ── 화면 전환 + 내부 화면 잠금 ──
-const INTERNAL = ['dash','intake','ledger','report','docs'];
-window.AUTH_OK = false; window.PENDING = null; window.CURRENT = 'dash';
-function show(id, navId){
-  document.querySelectorAll('.nav a').forEach(x=>x.classList.toggle('on', x.dataset.s===(navId||id)));
-  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id));
-  window.CURRENT = navId || id;
-  window.scrollTo(0,0);
-}
-function go(id){
-  if(INTERNAL.includes(id) && !window.AUTH_OK){ window.PENDING = id; show('lock', id); return; }
-  show(id);
-}
-document.querySelectorAll('.nav a').forEach(a=>{
-  a.addEventListener('click',()=>go(a.dataset.s));
-});
 
-// ── 예시 데이터 (월별 kg) ──
-const D = { // 전체 원장
-  2021:[0,0,0,0,22,30,35,38,42,48,50,55],
-  2022:[48,42,55,60,58,50,54,62,58,68,60,65],
-  2023:[90,85,110,95,100,88,92,78,85,95,72,60],
-  2024:[63.2,88.7,53.1,84.7,67.2,10.1,15.9,48.1,29,35.2,0,4],
-  2025:[130,118,155,140,152,171,170,72,41,104,89,57],
-  2026:[123,98,148,113,83,167,132,0,0,0,0,0]
-};
-const P = { // 알맹상점 (예시)
-  2021:[0,0,0,0,12,18,22,25,28,30,20,25],
-  2022:[24,20,28,30,29,25,27,31,29,34,30,33],
-  2023:[36,34,44,38,40,35,37,31,34,38,29,24],
-  2024:[57.3,75.5,38.6,76,59.8,0,0,34,20.5,21.8,0,0],
-  2025:[30,28,36,33,35,40,39,17,10,24,21,17],
-  2026:[25,18,30,22,15,40,39,0,0,0,0,0]
-};
-const CO2 = 0.645, CAPS = 400, YIELD = 0.83; // 보수계수·병뚜껑·수율 (예시)
-const fmt = n => n.toLocaleString('ko-KR', {maximumFractionDigits:1});
+<!-- 수정 모달 -->
+<div class="modalbg" id="modalbg">
+  <div class="modal" id="modal"></div>
+</div>
 
-function drawBars(barsEl, xEl, arr, sel){
-  const max = Math.max(...arr, 1);
-  barsEl.innerHTML = arr.map((v,i)=>{
-    const h = Math.max(Math.round(v/max*88), v>0?4:1);
-    const mut = (sel!=='all' && i!==+sel) ? ' mut' : '';
-    return '<div class="bar'+mut+'" style="height:'+h+'%"><i>'+(v>0?fmt(v):'')+'</i></div>';
-  }).join('');
-  xEl.innerHTML = arr.map((_,i)=>'<span>'+(i+1)+'월</span>').join('');
-}
-function kgOf(data, y, m){ const a = data[y]; return m==='all' ? a.reduce((s,v)=>s+v,0) : a[+m]; }
-function labelOf(y,m){ return m==='all' ? y+'년 연간' : y+'년 '+(+m+1)+'월'; }
+<!-- 인쇄 영역 -->
+<div id="printArea"></div>
 
-// 내부 월간·연간 리포트
-function upd(){
-  const y = document.getElementById('ry').value, m = document.getElementById('rm').value;
-  const kg = kgOf(D, y, m);
-  document.getElementById('rlabel').textContent = labelOf(y,m);
-  document.getElementById('rk1').innerHTML = fmt(kg)+'<small> kg</small>';
-  document.getElementById('rd1').textContent = m==='all' ? '12개월 합계 (원장 자동 집계)' : '해당 월 입고 로트 합계';
-  document.getElementById('rk2').innerHTML = fmt(kg*YIELD)+'<small> kg</small>';
-  document.getElementById('rk3').innerHTML = fmt(kg*CO2)+'<small> kgCO₂e</small>';
-  document.getElementById('rk4').innerHTML = fmt(Math.round(kg*CAPS))+'<small> 개</small>';
-  drawBars(document.getElementById('rbars'), document.getElementById('rx'), D[y], m);
-}
-document.getElementById('ry').addEventListener('change', upd);
-document.getElementById('rm').addEventListener('change', upd);
-
-// 파트너 임팩트 페이지
-function pupd(){
-  const y = document.getElementById('py').value, m = document.getElementById('pm').value;
-  const kg = kgOf(P, y, m);
-  document.getElementById('plabel').textContent = labelOf(y,m);
-  document.getElementById('pk1').innerHTML = fmt(kg)+'<small> kg</small>';
-  document.getElementById('pk2').innerHTML = fmt(kg*CO2)+'<small> kgCO₂e</small>';
-  document.getElementById('pk3').innerHTML = fmt(Math.round(kg*CAPS))+'<small> 개</small>';
-  drawBars(document.getElementById('pbars'), document.getElementById('px'), P[y], m);
-}
-document.getElementById('py').addEventListener('change', pupd);
-document.getElementById('pm').addEventListener('change', pupd);
-
-// 렌탈·제작 탄소 계산기
-const EF = { pe:[2.96,1.09], pp:[1.84,0.53], hdpe:[1.89,0.56] }; // [버진, 재생] 표준
-function calc(){
-  const kg = Math.max(+document.getElementById('ckg').value||0, 0);
-  const [v,r] = EF[document.getElementById('cm').value];
-  const virgin = kg*v, recycled = kg*r;
-  const std = kg*(v-r)*0.81, cons = kg*0.9*0.81;
-  document.getElementById('cb1').style.width = '72%';
-  document.getElementById('cb2').style.width = Math.max(recycled/virgin*72, 3)+'%';
-  document.getElementById('cv1').textContent = fmt(virgin)+' kgCO₂e';
-  document.getElementById('cv2').textContent = fmt(recycled)+' kgCO₂e';
-  document.getElementById('cr1').textContent = '−'+fmt(std)+' kgCO₂e';
-  document.getElementById('cr2').textContent = '−'+fmt(cons)+' kgCO₂e';
-  document.getElementById('cr3').textContent = '약 '+fmt(std/6.6)+'그루';
-}
-
-// 초기 렌더 — 로그인 전이므로 대시보드 대신 잠금 화면부터
-go('dash'); upd(); pupd(); calc();
-</script>
 <script type="module">
-// ── Firebase 인증 (@lowlit.co 전용 게이트) ──
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, doc, getDocs, getDoc, addDoc, setDoc, updateDoc, deleteDoc, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+/* ─────────── 기본 설정 ─────────── */
 const firebaseConfig = {
   apiKey: "AIzaSyAd2BhYWgulPDmZON6G1uj47mGTCZYDxvU",
   authDomain: "lowlit-impact.firebaseapp.com",
   projectId: "lowlit-impact",
   storageBucket: "lowlit-impact.firebasestorage.app",
   messagingSenderId: "1025412036792",
-  appId: "1:1025412036792:web:f67e2b343948bc9ba89c4d",
-  measurementId: "G-BKF50E9KZS"
+  appId: "1:1025412036792:web:f67e2b343948bc9ba89c4d"
+};
+const DRIVE_FOLDER = "https://drive.google.com/drive/folders/19_M8vwxstmCmoneRaJW9YRezLJj8_WAo";
+const CO2=0.645, CO2STD=0.939, CAPS=400, YIELD=0.83, EF={pe:[2.96,1.09],pp:[1.84,0.53],hdpe:[1.89,0.56]};
+const $=s=>document.getElementById(s);
+const fmt=n=>(+n||0).toLocaleString('ko-KR',{maximumFractionDigits:1});
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const BASE=location.origin+location.pathname;
+const thisYear=new Date().getFullYear();
+
+let app,auth,db,USER=null,ADMIN=false,FBOK=true;
+try{ app=initializeApp(firebaseConfig); auth=getAuth(app); db=getFirestore(app); }
+catch(e){ FBOK=false; status('데이터베이스 연결에 실패했어요: '+e.message); }
+const lotsCol=()=>collection(db,'internal','main','lots');
+
+function status(t){ const b=$('statusbar'); if(!t){b.classList.remove('show');return;} b.textContent=t; b.classList.add('show'); }
+
+/* ─────────── 예시 파트너 데이터 (임팩트 예시 화면 전용) ─────────── */
+const DEMO_PARTNER={ name:'알맹상점 (예시)', type:'제로웨이스트샵', region:'서울 마포', joined:'2021.05', total:1842.3, last:'2026-07-14',
+  months:{'2026-01':25,'2026-02':18,'2026-03':30,'2026-04':22,'2026-05':15,'2026-06':40,'2026-07':39,
+          '2025-01':30,'2025-02':28,'2025-03':36,'2025-04':33,'2025-05':35,'2025-06':40,'2025-07':39,'2025-08':17,'2025-09':10,'2025-10':24,'2025-11':21,'2025-12':17} };
+
+/* ─────────── 내비게이션 ─────────── */
+const NAV_PUBLIC=[
+  {grp:'파트너와 함께',items:[
+    ['pickers','🌱 티끌피커스 소개'],
+    ['apply','✍️ 피커스 신청'],
+    ['impact','🏪 파트너 임팩트 (예시)'],
+    ['story','🔍 제품 스토리 (예시)'],
+    ['method','🧮 산정 방법론']]},
+  {grp:'기업과 함께',items:[
+    ['rental','🛋️ 렌탈·제작 안내']]}
+];
+const NAV_ADMIN=[
+  {grp:'내부 관리 · 🔒',items:[
+    ['admin/dash','📊 대시보드'],
+    ['admin/intake','➕ 입고 등록'],
+    ['admin/ledger','📒 입고 원장'],
+    ['admin/report','📅 월간·연간 리포트'],
+    ['admin/docs','📄 문서 발급'],
+    ['admin/partners','🗂️ 파트너 관리'],
+    ['admin/campaigns','🏢 캠페인 관리']]}
+];
+
+let CURRENT='';
+function renderNav(){
+  const h=location.hash.replace(/^#\/?/,'');
+  const nav=$('nav'); let html='';
+  const focus = (h.startsWith('p/')||h.startsWith('c/')) && !ADMIN;
+  if(focus){
+    const label = h.startsWith('p/') ? '🏪 내 임팩트 페이지' : '🏢 캠페인 리포트';
+    html+=`<a class="on">${label}</a>`;
+    html+=`<div class="nav-label">로우리트</div><a data-r="pickers">🌱 티끌피커스 소개</a>`;
+  } else {
+    const groups=ADMIN?[...NAV_ADMIN,...NAV_PUBLIC]:NAV_PUBLIC;
+    groups.forEach(g=>{
+      html+=`<div class="nav-label">${g.grp}</div>`;
+      g.items.forEach(([id,t])=>{ html+=`<a data-r="${id}" class="${CURRENT===id?'on':''}">${t}</a>`; });
+    });
+  }
+  nav.innerHTML=html;
+  nav.querySelectorAll('a[data-r]').forEach(a=>a.onclick=()=>go(a.dataset.r));
+}
+window.go=id=>{ location.hash='#/'+id; };
+$('logoBtn').onclick=()=>go(ADMIN?'admin/dash':'pickers');
+$('adminLink')&&($('adminLink').onclick=()=>go('admin/dash'));
+
+/* ─────────── 라우팅 ─────────── */
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id)); window.scrollTo(0,0); }
+async function route(){
+  const h=location.hash.replace(/^#\/?/,'')||'pickers';
+  CURRENT=h; renderNav();
+  if(h.startsWith('p/')){ show('partner'); await renderPartnerPage(h.slice(2),false); return; }
+  if(h==='impact'){ show('partner'); await renderPartnerPage(null,true); return; }
+  if(h.startsWith('c/')){ show('campaign'); await renderCampaignPage(h.slice(2)); return; }
+  if(h.startsWith('admin')){
+    if(!ADMIN){ show('lock'); return; }
+    const id=h==='admin'?'admin/dash':h;
+    if(!document.getElementById(id)){ show('notfound'); return; }
+    show(id);
+    try{
+      if(id==='admin/dash') await renderDash();
+      if(id==='admin/intake') await renderIntake();
+      if(id==='admin/ledger') await renderLedger();
+      if(id==='admin/report') await renderReport();
+      if(id==='admin/docs') await renderDocs();
+      if(id==='admin/partners') await renderPartnersAdmin();
+      if(id==='admin/campaigns') await renderCampaignsAdmin();
+      status('');
+    }catch(e){ status('데이터를 불러오지 못했어요: '+(e.code||e.message)+' — Firebase 콘솔에서 Firestore가 생성되어 있는지 확인해 주세요.'); }
+    return;
+  }
+  if(document.getElementById(h)) show(h); else show('notfound');
+}
+window.addEventListener('hashchange',route);
+
+/* ─────────── 인증 ─────────── */
+const provider=new GoogleAuthProvider(); provider.setCustomParameters({hd:'lowlit.co'});
+function applyAuth(u){
+  if(u&&u.email&&u.email.toLowerCase().endsWith('@lowlit.co')){
+    USER=u; ADMIN=true;
+    $('authbox').innerHTML='🟢 '+esc(u.email)+'<br><a id="logoutBtn">로그아웃</a>';
+    $('logoutBtn').onclick=()=>signOut(auth);
+  }else{
+    if(u){ $('authMsg')&&($('authMsg').textContent='회사 계정(@lowlit.co)으로만 접근할 수 있어요.'); signOut(auth); }
+    USER=null; ADMIN=false;
+    $('authbox').innerHTML='<a id="adminLink2">관리자 로그인</a>';
+    $('adminLink2').onclick=()=>go('admin/dash');
+  }
+  route();
+}
+if(auth) onAuthStateChanged(auth,applyAuth);
+$('loginBtn').onclick=async()=>{
+  try{ await signInWithPopup(auth,provider); }
+  catch(e){ $('authMsg').textContent='로그인 실패: '+(e.code||e.message); }
 };
 
-const box = document.getElementById('authbox');
-const msg = document.getElementById('authMsg');
-let auth;
-try {
-  const app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
-} catch(e) {
-  msg.textContent = 'Firebase 초기화 실패: ' + e.message;
+/* ─────────── 공용 데이터 로딩 ─────────── */
+let PARTNERS=[],CAMPAIGNS=[],ALLLOTS=null;
+async function loadPartners(){ try{ const s=await getDocs(collection(db,'partners')); PARTNERS=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.total||0)-(a.total||0)); }catch(e){PARTNERS=[];} }
+async function loadCampaigns(){ try{ const s=await getDocs(collection(db,'campaigns')); CAMPAIGNS=s.docs.map(d=>({id:d.id,...d.data()})); }catch(e){CAMPAIGNS=[];} }
+async function loadAllLots(force){ if(ALLLOTS&&!force) return ALLLOTS;
+  const s=await getDocs(query(lotsCol(),orderBy('d','desc'))); ALLLOTS=s.docs.map(d=>({id:d.id,...d.data()})); return ALLLOTS; }
+function invalidate(){ ALLLOTS=null; }
+
+async function recalcPartner(pid){ if(!pid) return;
+  const s=await getDocs(query(lotsCol(),where('pid','==',pid)));
+  const months={}; let total=0,last='';
+  s.forEach(d=>{const l=d.data(); const mk=(l.d||'').slice(0,7); months[mk]=(months[mk]||0)+(+l.kg||0); total+=(+l.kg||0); if((l.d||'')>last)last=l.d;});
+  try{ await updateDoc(doc(db,'partners',pid),{months,total,last}); }catch(e){}
+}
+async function recalcCampaign(cid){ if(!cid) return;
+  const s=await getDocs(query(lotsCol(),where('cid','==',cid)));
+  let total=0; const lots=[];
+  s.forEach(d=>{const l=d.data(); total+=(+l.kg||0); lots.push({d:l.d,mat:l.mat,kg:l.kg});});
+  lots.sort((a,b)=>a.d<b.d?1:-1);
+  try{ await updateDoc(doc(db,'campaigns',cid),{total,lots}); }catch(e){}
 }
 
-const provider = new GoogleAuthProvider();
-provider.setCustomParameters({ hd: 'lowlit.co' }); // 계정 선택창에서 lowlit.co 계정 우선
-
-function applyAuth(u){
-  if (u && u.email && u.email.toLowerCase().endsWith('@lowlit.co')) {
-    window.AUTH_OK = true;
-    msg.textContent = '';
-    box.innerHTML = '🟢 ' + u.email + ' · <a id="logoutBtn" style="cursor:pointer;color:#d7e96b;text-decoration:underline">로그아웃</a>';
-    document.getElementById('logoutBtn').onclick = () => signOut(auth);
-    go(window.PENDING || window.CURRENT || 'dash');
-    window.PENDING = null;
-  } else {
-    if (u) { // 로그인은 됐지만 회사 계정이 아님
-      msg.textContent = '회사 계정(@lowlit.co)으로만 접근할 수 있어요. 다른 계정으로 다시 로그인해 주세요.';
-      signOut(auth);
-    }
-    window.AUTH_OK = false;
-    box.innerHTML = '⚪ 내부 화면은 로그인 필요';
-    if (INTERNAL.includes(window.CURRENT)) go(window.CURRENT); // 내부 화면 보고 있었으면 잠금
-  }
+/* ─────────── 유틸: 막대그래프 / CSV / 세그 ─────────── */
+function drawBars(barsEl,xEl,arr,sel){
+  const max=Math.max(...arr,1);
+  barsEl.innerHTML=arr.map((v,i)=>{
+    const h=Math.max(Math.round(v/max*88),v>0?4:1);
+    const mut=(sel!=='all'&&sel!==undefined&&i!==+sel)?' mut':'';
+    return `<div class="bar${mut}" style="height:${h}%"><i>${v>0?fmt(v):''}</i></div>`;
+  }).join('');
+  xEl.innerHTML=arr.map((_,i)=>`<span>${i+1}월</span>`).join('');
 }
-if (auth) onAuthStateChanged(auth, applyAuth);
+function monthsToYearArr(months,y){ const a=Array(12).fill(0); Object.entries(months||{}).forEach(([k,v])=>{ if(k.startsWith(y+'-')) a[+k.slice(5,7)-1]=+v; }); return a; }
+function yearsOf(months){ const ys=[...new Set(Object.keys(months||{}).map(k=>k.slice(0,4)))].sort(); return ys.length?ys:[String(thisYear)]; }
+function downloadCSV(name,rows){
+  const csv='﻿'+rows.map(r=>r.map(c=>`"${String(c??'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=name; a.click();
+}
+function segInit(id){ const el=$(id); el.querySelectorAll('span').forEach(s=>s.onclick=()=>{el.querySelectorAll('span').forEach(x=>x.classList.remove('on'));s.classList.add('on');}); }
+function segVal(id){ return $(id).querySelector('span.on')?.textContent||''; }
+['apType','apAmt','apDeliv','inMat','inForm','inWeigh','inDeliv'].forEach(segInit);
+function fillYearSel(el,years,def){ el.innerHTML=years.map(y=>`<option ${y==def?'selected':''}>${y}</option>`).join(''); }
 
-document.getElementById('loginBtn').addEventListener('click', async () => {
-  if (!auth) return;
-  try { await signInWithPopup(auth, provider); }
-  catch(e) {
-    msg.textContent = '로그인 실패: ' + (e.code || e.message) +
-      ' — 배포된 주소(lowlit-impact.vercel.app)에서 시도했는지, Firebase 승인된 도메인에 해당 주소를 추가했는지 확인해 주세요.';
+/* ─────────── 공개: 히어로 숫자 (전체 실적 자동) ─────────── */
+async function renderHero(){
+  try{ await loadPartners();
+    const total=PARTNERS.reduce((s,p)=>s+(+p.total||0),0);
+    if(total>0){ $('hero1').textContent=PARTNERS.length+'곳'; $('hero2').textContent=fmt(total)+' kg'; $('hero3').textContent=fmt(total*CO2)+' kgCO₂e'; }
+  }catch(e){}
+}
+
+/* ─────────── 파트너 페이지 (/p/슬러그 또는 예시) ─────────── */
+let PT=null,PT_DEMO=false;
+async function renderPartnerPage(slug,demo){
+  PT_DEMO=demo;
+  if(demo){ PT=DEMO_PARTNER;
+    $('ptDemoChip').style.display=''; $('ptTitle').textContent='파트너 임팩트 페이지 (예시)';
+    $('ptSub').textContent='피커스가 되면 이런 전용 페이지를 받게 됩니다. 아래 수치는 예시입니다.';
+  }else{
+    $('ptDemoChip').style.display='none'; $('ptTitle').textContent='파트너 임팩트';
+    $('ptSub').textContent='';
+    try{ const snap=await getDoc(doc(db,'partners',slug));
+      if(!snap.exists()){ show('notfound'); return; }
+      PT={id:slug,...snap.data()};
+    }catch(e){ show('notfound'); return; }
   }
-});
+  $('ptName').textContent=(PT.name||'')+' × 티끌피커스';
+  $('ptMeta').textContent=[PT.joined?PT.joined+'부터 함께한 자원순환 파트너':'',PT.type,PT.region].filter(Boolean).join(' · ');
+  $('ptTotal').textContent=fmt(PT.total||0)+' kg';
+  $('ptCo2').textContent=fmt((PT.total||0)*CO2)+' kgCO₂e';
+  $('ptCaps').textContent=fmt(Math.round((PT.total||0)*CAPS))+'개';
+  $('ptFoot').textContent='* 새 플라스틱(신재)으로 만들 때와 비교해 함께 줄인 탄소량 (보수 기준) · 산정 방법론 공개'+(PT.last?' · 최근 기증 '+PT.last:'');
+  const years=yearsOf(PT.months); fillYearSel($('py'),years,years[years.length-1]);
+  $('py').onchange=pupd; $('pm').onchange=pupd;
+  $('ptCertBtn').onclick=()=>{ const y=$('py').value,m=$('pm').value; makeMonthlyCert(PT, y+'-'+(m==='all'?'01':String(+m+1).padStart(2,'0')), m==='all'); };
+  pupd();
+}
+function pupd(){
+  const y=$('py').value,m=$('pm').value;
+  const arr=monthsToYearArr(PT.months,y);
+  const kg=m==='all'?arr.reduce((s,v)=>s+v,0):arr[+m];
+  $('plabel').textContent=m==='all'?y+'년 연간':y+'년 '+(+m+1)+'월';
+  $('pk1').innerHTML=fmt(kg)+'<small> kg</small>';
+  $('pk2').innerHTML=fmt(kg*CO2)+'<small> kgCO₂e</small>';
+  $('pk3').innerHTML=fmt(Math.round(kg*CAPS))+'<small> 개</small>';
+  drawBars($('pbars'),$('px'),arr,m);
+}
+
+/* ─────────── 캠페인 리포트 (/c/아이디) ─────────── */
+async function renderCampaignPage(cid){
+  let C=null;
+  try{ const snap=await getDoc(doc(db,'campaigns',cid)); if(snap.exists()) C={id:cid,...snap.data()}; }catch(e){}
+  if(!C){ show('notfound'); return; }
+  $('cpTitle').textContent=C.name||'캠페인 리포트';
+  $('cpId').textContent=C.id;
+  $('cpSub').textContent=[C.org,C.period,C.sites?C.sites+' 사업장':''].filter(Boolean).join(' · ');
+  const kg=+C.total||0;
+  $('ck1').innerHTML=fmt(kg)+'<small> kg</small>';
+  $('cd1').textContent=C.target?('목표 '+C.target+'kg 대비 '+Math.round(kg/C.target*100)+'%'):'';
+  $('ck2').innerHTML=fmt(kg*CO2)+'<small> kgCO₂e</small>';
+  $('ck3').innerHTML=(C.participants?fmt(C.participants):'—')+'<small> 명</small>';
+  $('cd3').textContent=C.times?('참여 횟수 '+fmt(C.times)+'회'):'';
+  $('ck4').innerHTML=fmt(Math.round(kg*CAPS))+'<small> 개</small>';
+  const lots=C.lots||[];
+  $('cpLots').innerHTML='<tr><th>일자</th><th>재질</th><th style="text-align:right">kg</th></tr>'+
+    (lots.length?lots.map(l=>`<tr><td class="num">${esc(l.d)}</td><td>${esc(l.mat)}</td><td class="num" style="text-align:right">${fmt(l.kg)}</td></tr>`).join(''):'<tr><td colspan="3" style="color:var(--ink2)">아직 귀속된 로트가 없습니다</td></tr>');
+  $('cpQuote').textContent=`당사는 ${C.period||''} 로우리트콜렉티브와 함께한 「${C.name||''}」을 통해 폐플라스틱 ${fmt(kg)}kg을 수거·재자원화하였으며, 이를 통해 약 ${fmt(kg*CO2)}kgCO₂e(보수 기준)의 탄소 감축에 기여하였습니다.
+※ 산정: 로우리트 임팩트 원장 산정 방법론 v2.0 (계수 출처 공개) · 이중 청구 없음 확인`;
+  $('cpCsvBtn').onclick=()=>downloadCSV(C.id+'_로트명세.csv',[['일자','재질','kg'],...lots.map(l=>[l.d,l.mat,l.kg])]);
+}
+
+/* ─────────── 관리자: 대시보드 ─────────── */
+async function renderDash(){
+  const lots=await loadAllLots(); await loadPartners();
+  const total=lots.reduce((s,l)=>s+(+l.kg||0),0);
+  $('dk1').innerHTML=fmt(total)+'<small> kg</small>'; $('dd1').textContent='로트 '+lots.length+'건 · 파트너 '+PARTNERS.length+'곳';
+  $('dk2').innerHTML=fmt(total*YIELD)+'<small> kg</small>';
+  $('dk3').innerHTML=fmt(total*CO2)+'<small> kgCO₂e</small>';
+  const withPhoto=lots.filter(l=>l.photo).length, pct=lots.length?Math.round(withPhoto/lots.length*100):0;
+  $('dk4').innerHTML=pct+'<small> %</small>'; $('dk4bar').style.width=pct+'%';
+  const y=String(thisYear); const arr=Array(12).fill(0);
+  lots.forEach(l=>{ if((l.d||'').startsWith(y+'-')) arr[+l.d.slice(5,7)-1]+=(+l.kg||0); });
+  $('dbarsLabel').textContent=y+'년'; drawBars($('dbars'),$('dx'),arr,'all');
+  const mats={}; lots.forEach(l=>{mats[l.mat||'기타']=(mats[l.mat||'기타']||0)+(+l.kg||0);});
+  const colors={'PE/LDPE':'#2c5743','PP':'#6fcf97','HDPE':'#d7e96b','PLA':'#c9c4b4','기타':'#a8a693'};
+  const ents=Object.entries(mats).sort((a,b)=>b[1]-a[1]);
+  $('dstack').innerHTML=ents.map(([m,v])=>`<span style="flex:${Math.max(v,0.01)};background:${colors[m]||'#a8a693'}"></span>`).join('')||'<span style="flex:1;background:#e8e5da"></span>';
+  $('dleg').innerHTML=ents.map(([m,v])=>`<span><i class="dot" style="background:${colors[m]||'#a8a693'}"></i>${m} ${total?Math.round(v/total*100):0}%</span>`).join('')||'데이터 없음';
+  $('dtop').innerHTML='<tr><th>파트너</th><th style="text-align:right">누적 kg</th><th style="text-align:right">최근 기증</th></tr>'+
+    PARTNERS.slice(0,6).map(p=>`<tr><td>${esc(p.name)}</td><td class="num" style="text-align:right">${fmt(p.total||0)}</td><td class="num" style="text-align:right">${esc(p.last||'—')}</td></tr>`).join('');
+  const noPhoto=lots.filter(l=>!l.photo).slice(0,5);
+  $('dalertN').textContent=noPhoto.length+'건';
+  $('dalerts').innerHTML=noPhoto.length?noPhoto.map(l=>`<tr><td>⚠️ ${esc(l.d)} ${esc(l.pname)} ${fmt(l.kg)}kg — 사진 누락</td></tr>`).join(''):'<tr><td style="color:var(--ink2)">증빙 누락 건이 없습니다 👍</td></tr>';
+}
+
+/* ─────────── 관리자: 입고 등록 ─────────── */
+async function renderIntake(){
+  await loadPartners(); await loadCampaigns();
+  $('inDate').value=new Date().toISOString().slice(0,10);
+  $('inPartner').innerHTML=PARTNERS.map(p=>`<option value="${p.id}">${esc(p.name)} (${esc(p.type||'')})</option>`).join('')||'<option value="">파트너를 먼저 등록하세요</option>';
+  $('inCampaign').innerHTML='<option value="">일반 (귀속 없음)</option>'+CAMPAIGNS.map(c=>`<option value="${c.id}">${esc(c.name)} (${c.id})</option>`).join('');
+  refreshRecent();
+  $('inSave').onclick=async()=>{
+    const pid=$('inPartner').value, kg=+$('inKg').value;
+    if(!pid){$('inMsg').textContent='파트너를 선택하세요.';return;}
+    if(!kg||kg<=0){$('inMsg').textContent='중량(kg)을 입력하세요.';return;}
+    $('inSave').disabled=true; $('inMsg').textContent='저장 중…';
+    try{
+      const p=PARTNERS.find(x=>x.id===pid);
+      await addDoc(lotsCol(),{ d:$('inDate').value, pid, pname:p?.name||'', mat:segVal('inMat'), form:segVal('inForm'),
+        kg, weigh:segVal('inWeigh'), delivery:segVal('inDeliv'), photo:$('inPhoto').value.trim(),
+        cid:$('inCampaign').value, memo:$('inMemo').value.trim(), created:Date.now() });
+      invalidate();
+      await recalcPartner(pid); if($('inCampaign').value) await recalcCampaign($('inCampaign').value);
+      $('inMsg').textContent='✅ 저장되었습니다. 파트너 실적이 갱신되었어요.';
+      $('inKg').value='';$('inPhoto').value='';$('inMemo').value='';
+      refreshRecent();
+    }catch(e){ $('inMsg').textContent='저장 실패: '+(e.code||e.message); }
+    $('inSave').disabled=false;
+  };
+}
+async function refreshRecent(){
+  try{ const s=await getDocs(query(lotsCol(),orderBy('d','desc'),limit(6)));
+    $('inRecent').innerHTML='<tr><th>일자</th><th>파트너</th><th>재질</th><th style="text-align:right">kg</th><th>증빙</th></tr>'+
+      s.docs.map(d=>{const l=d.data();return `<tr><td class="num">${esc(l.d)}</td><td>${esc(l.pname)}</td><td>${esc(l.mat)}</td><td class="num" style="text-align:right">${fmt(l.kg)}</td><td>${l.photo?'📷 ✓':'<span class="chip r">누락</span>'}</td></tr>`;}).join('');
+  }catch(e){}
+}
+
+/* ─────────── 관리자: 입고 원장 (필터·수정·삭제·CSV) ─────────── */
+let LROWS=[];
+async function renderLedger(){
+  await loadPartners();
+  const lots=await loadAllLots();
+  const years=[...new Set(lots.map(l=>(l.d||'').slice(0,4)))].filter(Boolean).sort();
+  fillYearSel($('ly'),years.length?years:[String(thisYear)],years[years.length-1]||thisYear);
+  $('lp').innerHTML='<option value="all">전체</option>'+PARTNERS.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  ['ly','lm','lp','lmat'].forEach(id=>$(id).onchange=drawLedger);
+  $('lev').onchange=drawLedger;
+  $('lCsvBtn').onclick=()=>downloadCSV('입고원장_'+$('ly').value+($('lm').value==='all'?'':'-'+$('lm').value)+'.csv',
+    [['입고일','파트너','재질','형태','kg','계량','전달','증빙링크','캠페인','메모'],
+     ...LROWS.map(l=>[l.d,l.pname,l.mat,l.form,l.kg,l.weigh,l.delivery,l.photo,l.cid,l.memo])]);
+  drawLedger();
+}
+async function drawLedger(){
+  const lots=await loadAllLots();
+  const y=$('ly').value,m=$('lm').value,p=$('lp').value,mat=$('lmat').value,ev=$('lev').checked;
+  LROWS=lots.filter(l=>{
+    if(!(l.d||'').startsWith(y+'-')) return false;
+    if(m!=='all'&&l.d.slice(5,7)!==m) return false;
+    if(p!=='all'&&l.pid!==p) return false;
+    if(mat!=='all'&&l.mat!==mat) return false;
+    if(ev&&!l.photo) return false;
+    return true;
+  });
+  const sum=LROWS.reduce((s,l)=>s+(+l.kg||0),0);
+  $('lSummary').innerHTML=`${y}년 ${m==='all'?'전체':+m+'월'} · ${LROWS.length}건 <span class="chip g">${fmt(sum)} kg</span>`;
+  $('ltable').innerHTML='<tr><th>입고일</th><th>파트너</th><th>재질</th><th>형태</th><th style="text-align:right">kg</th><th>계량</th><th>전달</th><th>증빙</th><th>귀속</th><th>메모</th><th></th></tr>'+
+    (LROWS.length?LROWS.map(l=>`<tr>
+      <td class="num">${esc(l.d)}</td><td>${esc(l.pname)}</td><td>${esc(l.mat)}</td><td>${esc(l.form||'')}</td>
+      <td class="num" style="text-align:right">${fmt(l.kg)}</td><td>${esc(l.weigh||'')}</td><td>${esc(l.delivery||'')}</td>
+      <td>${l.photo?`<a href="${esc(l.photo)}" target="_blank">📷</a>`:'<span class="chip r">없음</span>'}</td>
+      <td>${l.cid?`<span class="chip b">${esc(l.cid)}</span>`:'일반'}</td><td class="hint">${esc(l.memo||'')}</td>
+      <td style="white-space:nowrap"><button class="btn s o" data-e="${l.id}">✏️</button> <button class="btn s r" data-x="${l.id}">🗑</button></td>
+    </tr>`).join(''):'<tr><td colspan="11" style="color:var(--ink2)">조건에 맞는 기록이 없습니다</td></tr>');
+  document.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>editLot(b.dataset.e));
+  document.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>delLot(b.dataset.x));
+}
+function modal(html){ $('modal').innerHTML=html; $('modalbg').classList.add('show'); }
+window.closeModal=()=>$('modalbg').classList.remove('show');
+$('modalbg').onclick=e=>{ if(e.target.id==='modalbg') closeModal(); };
+async function editLot(id){
+  const l=(await loadAllLots()).find(x=>x.id===id); if(!l) return;
+  modal(`<h3>로트 수정 — ${esc(l.d)} ${esc(l.pname)}</h3>
+    <div class="frow"><label>입고일</label><input type="date" id="edD" value="${esc(l.d)}"></div>
+    <div class="frow"><label>파트너</label><select id="edP">${PARTNERS.map(p=>`<option value="${p.id}" ${p.id===l.pid?'selected':''}>${esc(p.name)}</option>`).join('')}</select></div>
+    <div class="frow"><label>재질</label><select id="edM">${['PE/LDPE','PP','HDPE','PLA','기타'].map(m=>`<option ${m===l.mat?'selected':''}>${m}</option>`).join('')}</select></div>
+    <div class="frow"><label>중량 (kg)</label><input type="number" step="0.01" id="edK" value="${l.kg}"></div>
+    <div class="frow"><label>증빙 사진 링크</label><input id="edPh" value="${esc(l.photo||'')}"></div>
+    <div class="frow"><label>메모</label><input id="edMe" value="${esc(l.memo||'')}"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn o" onclick="closeModal()">취소</button>
+      <button class="btn" id="edSave">저장</button>
+    </div>`);
+  $('edSave').onclick=async()=>{
+    const oldPid=l.pid,newPid=$('edP').value,p=PARTNERS.find(x=>x.id===newPid);
+    try{
+      await updateDoc(doc(db,'internal','main','lots',id),{ d:$('edD').value, pid:newPid, pname:p?.name||'', mat:$('edM').value, kg:+$('edK').value, photo:$('edPh').value.trim(), memo:$('edMe').value.trim() });
+      invalidate(); await recalcPartner(oldPid); if(newPid!==oldPid) await recalcPartner(newPid); if(l.cid) await recalcCampaign(l.cid);
+      closeModal(); drawLedger();
+    }catch(e){ alert('저장 실패: '+(e.code||e.message)); }
+  };
+}
+async function delLot(id){
+  const l=(await loadAllLots()).find(x=>x.id===id); if(!l) return;
+  if(!confirm(`${l.d} ${l.pname} ${l.kg}kg 기록을 삭제할까요?`)) return;
+  try{ await deleteDoc(doc(db,'internal','main','lots',id)); invalidate(); await recalcPartner(l.pid); if(l.cid) await recalcCampaign(l.cid); drawLedger(); }
+  catch(e){ alert('삭제 실패: '+(e.code||e.message)); }
+}
+
+/* ─────────── 관리자: 월간·연간 리포트 ─────────── */
+async function renderReport(){
+  const lots=await loadAllLots();
+  const years=[...new Set(lots.map(l=>(l.d||'').slice(0,4)))].filter(Boolean).sort();
+  fillYearSel($('ry'),years.length?years:[String(thisYear)],years[years.length-1]||thisYear);
+  $('ry').onchange=rupd; $('rm').onchange=rupd;
+  $('rCsvBtn').onclick=()=>{
+    const y=$('ry').value; const arr=yearArr(y);
+    downloadCSV('리포트_'+y+'.csv',[['월','수거 kg','제품화 kg','탄소감축 kgCO2e','병뚜껑 개'],
+      ...arr.map((v,i)=>[(i+1)+'월',v,(v*YIELD).toFixed(1),(v*CO2).toFixed(1),Math.round(v*CAPS)]),
+      ['합계',arr.reduce((s,v)=>s+v,0).toFixed(1),'','','']]);
+  };
+  rupd();
+}
+function yearArr(y){ const arr=Array(12).fill(0); (ALLLOTS||[]).forEach(l=>{ if((l.d||'').startsWith(y+'-')) arr[+l.d.slice(5,7)-1]+=(+l.kg||0); }); return arr; }
+function rupd(){
+  const y=$('ry').value,m=$('rm').value;
+  const arr=yearArr(y);
+  const kg=m==='all'?arr.reduce((s,v)=>s+v,0):arr[+m];
+  $('rlabel').textContent=m==='all'?y+'년 연간':y+'년 '+(+m+1)+'월';
+  $('rk1').innerHTML=fmt(kg)+'<small> kg</small>';
+  $('rd1').textContent=m==='all'?'12개월 합계':'해당 월 로트 합계';
+  $('rk2').innerHTML=fmt(kg*YIELD)+'<small> kg</small>';
+  $('rk3').innerHTML=fmt(kg*CO2)+'<small> kgCO₂e</small>';
+  $('rk4').innerHTML=fmt(Math.round(kg*CAPS))+'<small> 개</small>';
+  drawBars($('rbars'),$('rx'),arr,m);
+  const total=(ALLLOTS||[]).reduce((s,l)=>s+(+l.kg||0),0);
+  $('rc1').innerHTML=fmt(total)+'<small> kg</small>'; $('rc1d').textContent='로트 '+(ALLLOTS||[]).length+'건';
+  $('rc2').innerHTML=fmt(total*YIELD)+'<small> kg</small>';
+  $('rc3').innerHTML=fmt(total*CO2)+'<small> kgCO₂e</small>';
+}
+
+/* ─────────── 관리자: 문서 발급 ─────────── */
+async function renderDocs(){
+  const lots=await loadAllLots(); await loadPartners();
+  $('dcLot').innerHTML=lots.slice(0,30).map(l=>`<option value="${l.id}">${esc(l.d)} · ${esc(l.pname)} · ${fmt(l.kg)}kg</option>`).join('')||'<option>기록이 없습니다</option>';
+  $('mcPartner').innerHTML=PARTNERS.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  $('mcMonth').value=new Date().toISOString().slice(0,7);
+  $('dcMake').onclick=()=>{
+    const l=lots.find(x=>x.id===$('dcLot').value); if(!l) return;
+    const serial='LWL-DC-'+l.d.replace(/-/g,'').slice(2)+'-'+l.id.slice(0,4).toUpperCase();
+    printDoc(`<div class="cert"><div class="serial">No. ${serial}</div>
+      <h2>기 증 확 인 서</h2><div class="sub2">CERTIFICATE OF DONATION</div>
+      <dl><dt>기증자</dt><dd><b>${esc(l.pname)}</b></dd>
+      <dt>수거 일자</dt><dd>${esc(l.d)} · ${esc(l.delivery||'')}</dd>
+      <dt>품목</dt><dd>${esc(l.mat)} ${esc(l.form||'')} (post-consumer)</dd>
+      <dt>중량</dt><dd><b>${fmt(l.kg)} kg</b> — ${esc(l.weigh||'')} 실측${l.photo?' (사진 증빙)':''}</dd></dl>
+      <div style="font-size:11.5px;color:#4a5c53">위 폐플라스틱이 로우리트콜렉티브에 기증되어 자원순환 공정에 투입되었음을 확인합니다.</div>
+      <div class="stamp"><div>인계자 (서명) ______<br>인수자 (서명) ______</div>
+      <div style="text-align:right">${new Date().toISOString().slice(0,10).replace(/-/g,'. ')}.<br><b>로우리트콜렉티브 주식회사</b></div>
+      <div class="seal">LOWLIT<br>COLLECTIVE</div></div></div>`);
+  };
+  $('mcMake').onclick=()=>{
+    const p=PARTNERS.find(x=>x.id===$('mcPartner').value); if(!p) return;
+    makeMonthlyCert(p,$('mcMonth').value,false);
+  };
+}
+function makeMonthlyCert(p,ym,annual){
+  const y=ym.slice(0,4);
+  const kg=annual? monthsToYearArr(p.months,y).reduce((s,v)=>s+v,0) : (p.months?.[ym]||0);
+  const label=annual? y+'년 연간' : y+'년 '+(+ym.slice(5,7))+'월';
+  const serial='LWL-PC-'+ym.replace('-','')+'-'+((p.id||p.name||'').toString().slice(0,4).toUpperCase());
+  printDoc(`<div class="cert"><div class="serial">No. ${serial}</div>
+    <h2>${annual?'연 간':'월 간'} 인 증 서</h2><div class="sub2">PARTNER IMPACT CERTIFICATE</div>
+    <dl><dt>파트너</dt><dd><b>${esc(p.name)}</b>${p.type?' ('+esc(p.type)+')':''}</dd>
+    <dt>대상 기간</dt><dd>${label}</dd>
+    <dt>기증량</dt><dd><b>${fmt(kg)} kg</b></dd>
+    <dt>탄소 감축 기여량</dt><dd><b>${fmt(kg*CO2)} kgCO₂e</b> (보수 기준 · 방법론 v2.0)</dd>
+    <dt>병뚜껑 환산</dt><dd>${fmt(Math.round(kg*CAPS))}개 (kg×400)</dd></dl>
+    <div style="font-size:11.5px;color:#4a5c53">위 파트너가 기간 내 티끌 플라스틱을 기증하여 자원순환과 탄소 감축에 기여하였음을 인증합니다.</div>
+    <div class="stamp"><div></div>
+    <div style="text-align:right">${new Date().toISOString().slice(0,10).replace(/-/g,'. ')}.<br><b>로우리트콜렉티브 주식회사</b></div>
+    <div class="seal">LOWLIT<br>COLLECTIVE</div></div></div>`);
+}
+function printDoc(html){ $('printArea').innerHTML=`<div style="max-width:640px;margin:0 auto">${html}</div>`; window.print(); }
+
+/* ─────────── 관리자: 파트너 관리 ─────────── */
+function slugify(s){ return s.toLowerCase().replace(/[^a-z0-9가-힣]+/g,'-').replace(/^-|-$/g,'')||('p'+Date.now().toString(36)); }
+async function renderPartnersAdmin(){
+  await loadPartners();
+  $('patable').innerHTML='<tr><th>이름</th><th>속성</th><th>전용 주소</th><th style="text-align:right">누적 kg</th><th>최근 기증</th><th></th></tr>'+
+    (PARTNERS.length?PARTNERS.map(p=>{
+      const url=BASE+'#/p/'+p.id;
+      return `<tr><td><b>${esc(p.name)}</b></td><td>${esc(p.type||'')}</td>
+        <td class="num" style="font-size:11px">…#/p/${esc(p.id)} <button class="btn s o" data-cp="${url}">복사</button></td>
+        <td class="num" style="text-align:right">${fmt(p.total||0)}</td><td class="num">${esc(p.last||'—')}</td>
+        <td style="white-space:nowrap"><button class="btn s o" data-view="${p.id}">보기</button> <button class="btn s o" data-pe="${p.id}">✏️</button> <button class="btn s o" data-rc="${p.id}">재계산</button></td></tr>`;
+    }).join(''):'<tr><td colspan="6" style="color:var(--ink2)">등록된 파트너가 없습니다 — "+ 새 파트너"로 시작하세요</td></tr>');
+  document.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>{navigator.clipboard.writeText(b.dataset.cp);b.textContent='복사됨';setTimeout(()=>b.textContent='복사',1200);});
+  document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>go('p/'+b.dataset.view));
+  document.querySelectorAll('[data-pe]').forEach(b=>b.onclick=()=>partnerForm(PARTNERS.find(p=>p.id===b.dataset.pe)));
+  document.querySelectorAll('[data-rc]').forEach(b=>b.onclick=async()=>{b.textContent='…';await recalcPartner(b.dataset.rc);b.textContent='완료';renderPartnersAdmin();});
+  $('paAdd').onclick=()=>partnerForm(null);
+  // 신청 접수함
+  try{
+    const s=await getDocs(query(collection(db,'applications'),orderBy('created','desc')));
+    const apps=s.docs.map(d=>({id:d.id,...d.data()}));
+    $('appN').textContent=apps.length+'건';
+    $('apptable').innerHTML='<tr><th>일자</th><th>공간</th><th>속성</th><th>담당자</th><th>연락처</th><th></th></tr>'+
+      (apps.length?apps.map(a=>`<tr><td class="num">${new Date(a.created||0).toISOString().slice(0,10)}</td><td><b>${esc(a.name)}</b></td><td>${esc(a.type)}</td><td>${esc(a.person)}</td><td class="num">${esc(a.phone)}</td>
+        <td style="white-space:nowrap"><button class="btn s" data-appr="${a.id}">승인→파트너 등록</button> <button class="btn s r" data-adel="${a.id}">삭제</button></td></tr>`).join(''):'<tr><td colspan="6" style="color:var(--ink2)">새 신청이 없습니다</td></tr>');
+    document.querySelectorAll('[data-appr]').forEach(b=>b.onclick=()=>{const a=apps.find(x=>x.id===b.dataset.appr);partnerForm({name:a.name,type:a.type,region:a.addr,_fromApp:a.id});});
+    document.querySelectorAll('[data-adel]').forEach(b=>b.onclick=async()=>{ if(confirm('신청을 삭제할까요?')){await deleteDoc(doc(db,'applications',b.dataset.adel));renderPartnersAdmin();} });
+  }catch(e){}
+}
+function partnerForm(p){
+  const isNew=!p||!p.id;
+  modal(`<h3>${isNew?'새 파트너 등록':'파트너 수정'}</h3>
+    <div class="frow"><label>이름 <em>*</em></label><input id="pfName" value="${esc(p?.name||'')}"></div>
+    <div class="frow"><label>주소용 영문 ID <em>*</em> ${isNew?'':'(변경 불가)'}</label><input id="pfSlug" value="${esc(p?.id||'')}" ${isNew?'placeholder="예: almang — 전용 주소가 됩니다"':'disabled'}></div>
+    <div class="frow"><label>속성</label><select id="pfType">${['제로웨이스트샵','환경단체','교육기관','사회복지기관','사기업','기타'].map(t=>`<option ${t===(p?.type||'')?'selected':''}>${t}</option>`).join('')}</select></div>
+    <div class="frow"><label>지역</label><input id="pfRegion" value="${esc(p?.region||'')}" placeholder="예: 서울 마포"></div>
+    <div class="frow"><label>함께한 시작</label><input id="pfJoined" value="${esc(p?.joined||'')}" placeholder="예: 2021.05"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn o" onclick="closeModal()">취소</button>
+      <button class="btn" id="pfSave">저장</button>
+    </div>`);
+  $('pfSave').onclick=async()=>{
+    const name=$('pfName').value.trim(); if(!name){alert('이름을 입력하세요');return;}
+    const slug=isNew?slugify($('pfSlug').value.trim()||name):p.id;
+    try{
+      if(isNew){ await setDoc(doc(db,'partners',slug),{name,type:$('pfType').value,region:$('pfRegion').value.trim(),joined:$('pfJoined').value.trim(),months:{},total:0,last:'',created:Date.now()}); }
+      else{ await updateDoc(doc(db,'partners',slug),{name,type:$('pfType').value,region:$('pfRegion').value.trim(),joined:$('pfJoined').value.trim()}); }
+      if(p?._fromApp) await deleteDoc(doc(db,'applications',p._fromApp));
+      closeModal(); renderPartnersAdmin();
+    }catch(e){ alert('저장 실패: '+(e.code||e.message)); }
+  };
+}
+
+/* ─────────── 관리자: 캠페인 관리 ─────────── */
+async function renderCampaignsAdmin(){
+  await loadCampaigns();
+  $('catable').innerHTML='<tr><th>ID</th><th>캠페인명</th><th>기업</th><th>기간</th><th style="text-align:right">수거 kg</th><th>리포트 주소</th><th></th></tr>'+
+    (CAMPAIGNS.length?CAMPAIGNS.map(c=>{
+      const url=BASE+'#/c/'+c.id;
+      return `<tr><td class="num">${esc(c.id)}</td><td><b>${esc(c.name)}</b></td><td>${esc(c.org||'')}</td><td class="num">${esc(c.period||'')}</td>
+      <td class="num" style="text-align:right">${fmt(c.total||0)}</td>
+      <td class="num" style="font-size:11px">…#/c/${esc(c.id)} <button class="btn s o" data-cp="${url}">복사</button></td>
+      <td style="white-space:nowrap"><button class="btn s o" data-cv="${c.id}">보기</button> <button class="btn s o" data-ce="${c.id}">✏️</button> <button class="btn s o" data-cr="${c.id}">재계산</button></td></tr>`;
+    }).join(''):'<tr><td colspan="7" style="color:var(--ink2)">등록된 캠페인이 없습니다</td></tr>');
+  document.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>{navigator.clipboard.writeText(b.dataset.cp);b.textContent='복사됨';setTimeout(()=>b.textContent='복사',1200);});
+  document.querySelectorAll('[data-cv]').forEach(b=>b.onclick=()=>go('c/'+b.dataset.cv));
+  document.querySelectorAll('[data-ce]').forEach(b=>b.onclick=()=>campaignForm(CAMPAIGNS.find(c=>c.id===b.dataset.ce)));
+  document.querySelectorAll('[data-cr]').forEach(b=>b.onclick=async()=>{b.textContent='…';await recalcCampaign(b.dataset.cr);b.textContent='완료';renderCampaignsAdmin();});
+  $('caAdd').onclick=()=>campaignForm(null);
+}
+function campaignForm(c){
+  const isNew=!c;
+  modal(`<h3>${isNew?'새 캠페인':'캠페인 수정'}</h3>
+    <div class="frow"><label>캠페인 ID <em>*</em> ${isNew?'':'(변경 불가)'}</label><input id="cfId" value="${esc(c?.id||'')}" ${isNew?'placeholder="예: C-2607"':'disabled'}></div>
+    <div class="frow"><label>캠페인명 <em>*</em></label><input id="cfName" value="${esc(c?.name||'')}" placeholder="예: 임직원 자원순환 캠페인"></div>
+    <div class="frow"><label>기업명</label><input id="cfOrg" value="${esc(c?.org||'')}"></div>
+    <div class="frow"><label>기간</label><input id="cfPeriod" value="${esc(c?.period||'')}" placeholder="예: 2026년 6~7월"></div>
+    <div class="frow"><label>목표 수거량 (kg)</label><input type="number" id="cfTarget" value="${c?.target||''}"></div>
+    <div class="frow"><label>참여 인원 (명)</label><input type="number" id="cfPart" value="${c?.participants||''}"></div>
+    <div class="frow"><label>참여 횟수</label><input type="number" id="cfTimes" value="${c?.times||''}"></div>
+    <div class="frow"><label>사업장 수</label><input type="number" id="cfSites" value="${c?.sites||''}"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn o" onclick="closeModal()">취소</button>
+      <button class="btn" id="cfSave">저장</button>
+    </div>`);
+  $('cfSave').onclick=async()=>{
+    const id=isNew?$('cfId').value.trim():c.id, name=$('cfName').value.trim();
+    if(!id||!name){alert('ID와 캠페인명을 입력하세요');return;}
+    const data={name,org:$('cfOrg').value.trim(),period:$('cfPeriod').value.trim(),
+      target:+$('cfTarget').value||0,participants:+$('cfPart').value||0,times:+$('cfTimes').value||0,sites:+$('cfSites').value||0};
+    try{
+      if(isNew) await setDoc(doc(db,'campaigns',id),{...data,total:0,lots:[],created:Date.now()});
+      else await updateDoc(doc(db,'campaigns',id),data);
+      closeModal(); renderCampaignsAdmin();
+    }catch(e){ alert('저장 실패: '+(e.code||e.message)); }
+  };
+}
+
+/* ─────────── 공개: 신청 제출 ─────────── */
+$('apSubmit').onclick=async()=>{
+  if(!$('apAgree').checked){$('apMsg').textContent='개인정보 동의에 체크해 주세요.';return;}
+  const name=$('apName').value.trim(),person=$('apPerson').value.trim(),phone=$('apPhone').value.trim(),addr=$('apAddr').value.trim();
+  if(!name||!person||!phone||!addr){$('apMsg').textContent='필수 항목(*)을 모두 입력해 주세요.';return;}
+  $('apSubmit').disabled=true;$('apMsg').textContent='접수 중…';
+  try{
+    await addDoc(collection(db,'applications'),{name,person,phone,addr,email:$('apEmail').value.trim(),
+      type:segVal('apType'),amount:segVal('apAmt'),delivery:segVal('apDeliv'),memo:$('apMemo').value.trim(),created:Date.now()});
+    $('apMsg').textContent='✅ 신청이 접수되었어요! 3영업일 안에 연락드릴게요.';
+    ['apName','apPerson','apPhone','apEmail','apAddr','apMemo'].forEach(id=>$(id).value='');
+    $('apAgree').checked=false;
+  }catch(e){ $('apMsg').textContent='접수 실패: '+(e.code||e.message)+' — 잠시 후 다시 시도해 주세요.'; }
+  $('apSubmit').disabled=false;
+};
+
+/* ─────────── 공개: 탄소 계산기 ─────────── */
+$('calcBtn').onclick=calc;
+function calc(){
+  const kg=Math.max(+$('ckg').value||0,0);
+  const [v,r]=EF[$('cm').value];
+  const virgin=kg*v,recycled=kg*r,std=kg*(v-r)*0.81,cons=kg*0.9*0.81;
+  $('cb1').style.width='72%';
+  $('cb2').style.width=Math.max(recycled/Math.max(virgin,0.001)*72,3)+'%';
+  $('cv1').textContent=fmt(virgin)+' kgCO₂e'; $('cv2').textContent=fmt(recycled)+' kgCO₂e';
+  $('cr1').textContent='−'+fmt(std)+' kgCO₂e'; $('cr2').textContent='−'+fmt(cons)+' kgCO₂e';
+  $('cr3').textContent='약 '+fmt(std/6.6)+'그루';
+}
+
+/* ─────────── 시작 ─────────── */
+calc(); renderHero(); route();
 </script>
 </body>
 </html>
