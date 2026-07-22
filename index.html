@@ -154,9 +154,15 @@
   /* 인쇄 */
   #printArea{display:none}
   @media print{
-    .app,.modalbg{display:none!important}
-    #printArea{display:block;padding:20px}
     body{background:#fff}
+    .modalbg{display:none!important}
+    /* 문서(확인서·인증서) 인쇄: printArea만 */
+    body.pdoc .app{display:none!important}
+    body.pdoc #printArea{display:block;padding:20px}
+    /* 화면(리포트·원장 등) 인쇄: 본문만, 사이드바·버튼 숨김 */
+    body:not(.pdoc) .side{display:none!important}
+    body:not(.pdoc) .statusbar,body:not(.pdoc) .btn,body:not(.pdoc) select,body:not(.pdoc) input[type=file]{display:none!important}
+    body:not(.pdoc) .main{padding:10px;max-width:none}
   }
   @media(max-width:900px){.g4,.g3,.pubgrid,.two,.tiers{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}.side{display:none}}
 </style>
@@ -787,7 +793,7 @@ const firebaseConfig = {
 };
 const DRIVE_FOLDER = "https://drive.google.com/drive/folders/19_M8vwxstmCmoneRaJW9YRezLJj8_WAo";
 // ▼ Google Apps Script 웹앱 URL (사진 업로드 + 출고 시트 동기화)
-const GAS_UPLOAD_URL = "https://script.google.com/a/macros/lowlit.co/s/AKfycbwqYRbl8dJ-cMw6e-d-NozBt70X5IsLiMfsIw9v2Um8ZtsQXxw07bMH8LnPrlQ3oD3f/exec";
+const GAS_UPLOAD_URL = "https://script.google.com/macros/s/AKfycbwqYRbl8dJ-cMw6e-d-NozBt70X5IsLiMfsIw9v2Um8ZtsQXxw07bMH8LnPrlQ3oD3f/exec";
 // 시트·업로드 접근은 @lowlit.co 로그인 토큰을 스크립트가 서버에서 검증하는 방식으로 보호됩니다
 const CO2=0.645, CO2STD=0.939, CAPS=400, YIELD=0.83, EF={pe:[2.96,1.09],pp:[1.84,0.53],hdpe:[1.89,0.56]};
 const $=s=>document.getElementById(s);
@@ -1275,7 +1281,7 @@ async function loadShipsLive(force){
       });
     });
     SHIPS_LIVE.sort((a,b)=>a.d<b.d?1:-1);
-  }catch(e){ SHIPS_LIVE_ERR=e.message; }
+  }catch(e){ SHIPS_LIVE_ERR=/Failed to fetch/i.test(e.message)?'스크립트에 연결하지 못했어요 — Apps Script 배포의 액세스 권한이 "모든 사용자"인지, v3 코드로 "새 버전" 재배포했는지 확인해 주세요':e.message; }
   return SHIPS_LIVE;
 }
 async function drawShipLive(force){
@@ -1418,7 +1424,7 @@ async function renderDocs(){
         <dt>계량</dt><dd>${esc(l.weigh||'')} 실측${l.photo?' · 사진 증빙 보관':''}</dd>
       </dl>
       <div class="quote">위 티끌 플라스틱이 로우리트콜렉티브에 기증되어 자원순환 공정에 투입되었음을 확인합니다. 이 플라스틱은 새 제품으로 다시 태어나 500년의 순환 여정을 시작합니다.</div>
-      <div class="stamp"><div>인계자 (서명) ______<br>인수자 (서명) ______</div>
+      <div class="stamp"><div></div>
       <div style="text-align:right">${today}.<br><b>로우리트콜렉티브 주식회사</b></div>
       <div class="seal">LOWLIT<br>COLLECTIVE</div></div>
       <div class="foot2">탄소 감축 기여량은 신재 원료 제품 대비 회피배출량으로, 로우리트 산정 방법론 v2.0(계수 출처 공개)에 따라 보수 기준으로 계산되었습니다. 본 확인서는 발급 대장에 기록되며 일련번호로 진위를 확인할 수 있습니다.</div>
@@ -1452,7 +1458,12 @@ function makeMonthlyCert(p,ym,annual){
     <div class="foot2">탄소 감축 기여량은 신재 원료 제품 대비 회피배출량으로, 로우리트 산정 방법론 v2.0(계수 출처 공개)에 따라 보수 기준으로 계산되었습니다. 본 인증서는 발급 대장에 기록되며 일련번호로 진위를 확인할 수 있습니다.</div>
   </div><div class="terra"></div><div class="band"></div></div>`);
 }
-function printDoc(html){ $('printArea').innerHTML=`<div style="max-width:640px;margin:0 auto">${html}</div>`; window.print(); }
+function printDoc(html){
+  $('printArea').innerHTML=`<div style="max-width:640px;margin:0 auto">${html}</div>`;
+  document.body.classList.add('pdoc');
+  window.print();
+}
+window.addEventListener('afterprint',()=>document.body.classList.remove('pdoc'));
 
 /* ─────────── 관리자: 파트너 관리 ─────────── */
 function slugify(s){ return s.toLowerCase().replace(/[^a-z0-9가-힣]+/g,'-').replace(/^-|-$/g,'')||('p'+Date.now().toString(36)); }
