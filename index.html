@@ -607,9 +607,10 @@
         <span class="lab2" style="margin-left:8px">파트너</span>
         <select id="lp"><option value="all">전체</option></select>
         <span class="lab2" style="margin-left:8px">재질</span>
-        <select id="lmat"><option value="all">전체</option><option>PE/LDPE</option><option>PP</option><option>HDPE</option><option>PLA</option><option>기타</option></select>
+        <select id="lmat"><option value="all">전체</option><option>PE/LDPE</option><option>PP</option><option>HDPE</option><option>PP+HDPE</option><option>PLA</option><option>기타</option></select>
         <label style="display:flex;align-items:center;gap:5px;margin:0 0 0 8px;font-size:12px"><input type="checkbox" id="lev" style="width:auto"> 증빙 있음만</label>
         <span style="margin-left:auto;display:flex;gap:6px">
+          <label class="btn s o" style="cursor:pointer">과거 대장 가져오기<input type="file" id="lImport" accept=".csv" style="display:none"></label>
           <button class="btn s o" id="lCsvBtn">CSV 내보내기 (엑셀)</button>
           <button class="btn s o" onclick="window.print()">인쇄 / PDF</button>
         </span>
@@ -624,21 +625,17 @@
 
     <!-- ═══════════ 관리자: 출고 관리 ═══════════ -->
     <section class="screen" id="admin/ship">
-      <div class="htitle"><h1>출고 관리</h1><span class="chip y">🔒 내부 전용</span></div>
-      <div class="sub">판매·납품 완료된 제품 기준의 제품화 실적입니다. 수거량과 별개로 관리되며, 외부 재생원료 사용분도 함께 기록합니다.</div>
+      <div class="htitle"><h1>제품화 누적량 산정</h1><span class="chip y">🔒 내부 전용</span></div>
+      <div class="sub">판매·납품 완료된 제품 기준의 제품화 실적입니다. 수거량과 별개로 관리됩니다.</div>
       <div class="card" style="margin-bottom:14px">
-        <div class="ctitle">구글시트 자동 동기화 <span class="more">출고 시트를 그대로 읽어옵니다 · 구글시트 → 페이지 단방향</span></div>
+        <div class="ctitle">구글시트 자동 동기화 <span class="more">집계용 시트를 그대로 읽어옵니다 · 구글시트 → 페이지 단방향</span></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
           <input id="shUrl" placeholder="https://docs.google.com/spreadsheets/d/…" style="flex:1;min-width:260px">
           <button class="btn s" id="shSync">🔄 구글시트에서 불러오기</button>
           <label style="display:flex;align-items:center;gap:5px;font-size:12px;border:1.5px solid var(--line);border-radius:8px;padding:0 10px;cursor:pointer"><input type="checkbox" id="shAuto" style="width:auto"> 자동 (5분)</label>
           <a class="btn s o" id="shOpen" href="#" target="_blank" style="text-decoration:none">시트 열기</a>
         </div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
-          <span class="lab2">탭 이름</span><input id="shTabs" style="width:220px" placeholder="예: 25년도, 26년도">
-          <span class="hint">쉼표로 구분 · 시트 하단의 탭 이름과 정확히 같아야 해요</span>
-        </div>
-        <div class="hint" style="margin-bottom:8px">· 시트 공유를 <b>"링크가 있는 사용자 · 뷰어"</b>로 설정해야 페이지가 읽을 수 있습니다. (개인정보가 있다면 링크 관리에 주의하세요)</div>
+        <div class="hint" style="margin-bottom:8px">· 시트 하나에 누적 작성하면 자동으로 반영됩니다 (탭 이름 입력 불필요 — 주소의 gid 탭을 읽어요) · 시트 공유는 <b>"링크가 있는 사용자 · 뷰어"</b>로 설정 · 필요한 컬럼: <b>발송일(연도 포함), 제품, 수량</b> (+선택: 원료kg)</div>
         <div class="hint" id="shLiveMsg" style="margin-bottom:8px"></div>
         <div id="shLiveSum" style="margin-bottom:10px"></div>
         <div style="max-height:300px;overflow-y:auto;overflow-x:auto">
@@ -646,7 +643,8 @@
         </div>
       </div>
       <div class="card" style="margin-bottom:14px">
-        <div class="ctitle">제품 무게표 <span class="more">품목별 1개당 무게를 등록하면, 시트에 무게가 없어도 수량 × 단위 무게로 원료량이 자동 계산됩니다</span></div>
+        <div class="ctitle">제품 무게표 <span class="more">품목별 1개당 무게를 등록하면 수량 × 단위 무게로 원료량이 자동 계산됩니다</span></div>
+        <div class="hint" style="margin-bottom:8px">⚖️ 단위는 <b>g(그램)</b>입니다 — 예: 코스터 1개 25g, 키링 1개 8g. (1kg = 1,000g · kg가 아니라 g로 적어주세요)</div>
         <div style="max-height:280px;overflow-y:auto">
         <table id="wtable"></table>
         </div>
@@ -735,7 +733,7 @@
       <div class="htitle"><h1>파트너 관리</h1><span class="chip y">🔒 내부 전용</span></div>
       <div class="sub">파트너를 등록하면 전용 임팩트 페이지 주소가 만들어집니다. 주소를 복사해 파트너 담당자에게 전달하세요.</div>
       <div class="card" style="margin-bottom:14px">
-        <div class="ctitle">파트너 목록 <button class="btn s" id="paAdd">+ 새 파트너</button></div>
+        <div class="ctitle">파트너 목록 <span style="display:flex;gap:6px"><button class="btn s" id="paAdd">+ 새 파트너</button><label class="btn s o" style="cursor:pointer">CSV 가져오기<input type="file" id="paImport" accept=".csv" style="display:none"></label></span></div>
         <div style="overflow-x:auto">
         <table id="patable"><tr><th>이름</th><th>속성</th><th>전용 주소</th><th style="text-align:right">누적 kg</th><th>최근 기증</th><th></th></tr></table>
         </div>
@@ -791,7 +789,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, doc, getDocs, getDoc, addDoc, setDoc, updateDoc, deleteDoc, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, doc, getDocs, getDoc, addDoc, setDoc, updateDoc, deleteDoc, query, where, orderBy, limit, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* ─────────── 기본 설정 ─────────── */
 const firebaseConfig = {
@@ -841,7 +839,7 @@ const NAV_ADMIN=[
     ['admin/dash','📊 대시보드'],
     ['admin/intake','➕ 입고 등록'],
     ['admin/ledger','📒 입고 원장'],
-    ['admin/ship','📦 출고 관리'],
+    ['admin/ship','📦 제품화 누적량 산정'],
     ['admin/report','📅 월간·연간 리포트'],
     ['admin/docs','📄 문서 발급'],
     ['admin/partners','🗂️ 파트너 관리'],
@@ -1083,9 +1081,8 @@ async function renderDash(){
   $('dk1').innerHTML=fmt(total)+'<small> kg</small>'; $('dd1').textContent='로트 '+lots.length+'건 · 파트너 '+PARTNERS.length+'곳';
   const all=[...ships,...live];
   const shipKg=all.reduce((s,x)=>s+(+x.kg||0),0);
-  const shipTikkle=all.filter(x=>x.src==='티끌 수거분').reduce((s,x)=>s+(+x.kg||0),0);
   $('dk2').innerHTML=(all.length?fmt(shipKg):'—')+'<small> kg</small>';
-  $('dd2').textContent=all.length?('티끌 수거분 '+fmt(shipTikkle)+'kg · 외부·혼합 '+fmt(shipKg-shipTikkle)+'kg · 시트 '+live.length+'건+수동 '+ships.length+'건'):'출고 관리에서 시트 연동 또는 수동 등록을 시작하세요';
+  $('dd2').textContent=all.length?('시트 연동 '+live.length+'건 · 수동 '+ships.length+'건 합산'):'제품화 누적량 산정에서 시트 연동 또는 수동 등록을 시작하세요';
   $('dk3').innerHTML=fmt(total*CO2)+'<small> kgCO₂e</small>';
   const withPhoto=lots.filter(l=>l.photo).length, pct=lots.length?Math.round(withPhoto/lots.length*100):0;
   $('dk4').innerHTML=pct+'<small> %</small>'; $('dk4bar').style.width=pct+'%';
@@ -1103,7 +1100,7 @@ async function renderDash(){
     drawBars($('dbars'),$('dx'),arr,m);
   }
   const mats={}; lots.forEach(l=>{mats[l.mat||'기타']=(mats[l.mat||'기타']||0)+(+l.kg||0);});
-  const colors={'PE/LDPE':'#2c5743','PP':'#6fcf97','HDPE':'#d7e96b','PLA':'#c9c4b4','기타':'#a8a693'};
+  const colors={'PE/LDPE':'#2c5743','PP':'#6fcf97','HDPE':'#d7e96b','PP+HDPE':'#4a8f6a','PLA':'#c9c4b4','기타':'#a8a693'};
   const ents=Object.entries(mats).sort((a,b)=>b[1]-a[1]);
   $('dstack').innerHTML=ents.map(([m,v])=>`<span style="flex:${Math.max(v,0.01)};background:${colors[m]||'#a8a693'}"></span>`).join('')||'<span style="flex:1;background:#e8e5da"></span>';
   $('dleg').innerHTML=ents.map(([m,v])=>`<span><i class="dot" style="background:${colors[m]||'#a8a693'}"></i>${m} ${total?Math.round(v/total*100):0}%</span>`).join('')||'데이터 없음';
@@ -1187,7 +1184,46 @@ async function renderLedger(){
   $('lCsvBtn').onclick=()=>downloadCSV('입고원장_'+$('ly').value+($('lm').value==='all'?'':'-'+$('lm').value)+'.csv',
     [['입고일','파트너','재질','형태','kg','계량','전달','증빙링크','캠페인','메모'],
      ...LROWS.map(l=>[l.d,l.pname,l.mat,l.form,l.kg,l.weigh,l.delivery,l.photo,l.cid,l.memo])]);
+  $('lImport').onchange=async e=>{ const f=e.target.files[0]; e.target.value=''; if(f) await importLegacy(f); };
   drawLedger();
+}
+/* 과거 대장 일괄 가져오기 (CSV: 입고일,파트너ID,파트너,속성,재질,kg,전달방법,메모) */
+async function importLegacy(f){
+  const rows=parseCSV(await f.text()).filter(r=>r.length>=6);
+  const body=rows.filter(r=>/^\d{4}-\d{2}-\d{2}$/.test(String(r[0]).trim()));
+  if(!body.length){ alert('가져올 행을 찾지 못했어요 — "과거대장_가져오기.csv" 파일인지 확인해 주세요.'); return; }
+  try{
+    const ex=await getDocs(query(lotsCol(),where('legacy','==',true),limit(1)));
+    if(!ex.empty&&!confirm('⚠️ 이미 과거 대장을 가져온 기록이 있어요. 다시 가져오면 중복됩니다. 계속할까요?')) return;
+  }catch(e){}
+  const total=body.reduce((s,r)=>s+(+r[5]||0),0);
+  if(!confirm(body.length+'건 · 합계 '+fmt(total)+'kg (2021~) 을 원장에 가져올까요?\n계량방법은 "과거기록"으로 표시됩니다.')) return;
+  $('lSummary').textContent='⏳ 파트너 확인 중…';
+  await loadPartners();
+  const have=new Set(PARTNERS.map(p=>p.id));
+  const pmeta={};
+  body.forEach(r=>{ const pid=String(r[1]).trim(); if(pid&&!pmeta[pid]) pmeta[pid]={name:String(r[2]).trim(),type:String(r[3]).trim()}; });
+  for(const [pid,m] of Object.entries(pmeta)){
+    if(!have.has(pid)){ await setDoc(doc(db,'partners',pid),{name:m.name,type:m.type,region:'',joined:'',months:{},total:0,last:'',created:Date.now()}); have.add(pid); }
+  }
+  let n=0;
+  try{
+    for(let i=0;i<body.length;i+=400){
+      const batch=writeBatch(db);
+      body.slice(i,i+400).forEach(r=>{
+        batch.set(doc(lotsCol()),{ d:String(r[0]).trim(), pid:String(r[1]).trim(), pname:String(r[2]).trim(),
+          mat:String(r[4]).trim()||'기타', form:'', kg:+r[5]||0, weigh:'과거기록', delivery:String(r[6]||'').trim(),
+          photo:'', cid:'', memo:String(r[7]||'').trim(), legacy:true, created:Date.now() });
+      });
+      await batch.commit(); n+=Math.min(400,body.length-i);
+      $('lSummary').textContent='⏳ 가져오는 중… '+n+'/'+body.length;
+    }
+  }catch(e){ alert('가져오기 중단: '+(e.code||e.message)+' — '+n+'건까지 저장됐어요.'); }
+  invalidate();
+  $('lSummary').textContent='⏳ 파트너 실적 재계산 중…';
+  for(const pid of Object.keys(pmeta)) await recalcPartner(pid);
+  alert('✅ 완료 — '+n+'건을 가져왔고 파트너 '+Object.keys(pmeta).length+'곳의 실적을 갱신했어요.');
+  renderLedger();
 }
 async function drawLedger(){
   const lots=await loadAllLots();
@@ -1221,7 +1257,7 @@ async function editLot(id){
   modal(`<h3>로트 수정 — ${esc(l.d)} ${esc(l.pname)}</h3>
     <div class="frow"><label>입고일</label><input type="date" id="edD" value="${esc(l.d)}"></div>
     <div class="frow"><label>파트너</label><select id="edP">${PARTNERS.map(p=>`<option value="${p.id}" ${p.id===l.pid?'selected':''}>${esc(p.name)}</option>`).join('')}</select></div>
-    <div class="frow"><label>재질</label><select id="edM">${['PE/LDPE','PP','HDPE','PLA','기타'].map(m=>`<option ${m===l.mat?'selected':''}>${m}</option>`).join('')}</select></div>
+    <div class="frow"><label>재질</label><select id="edM">${['PE/LDPE','PP','HDPE','PP+HDPE','PLA','기타'].map(m=>`<option ${m===l.mat?'selected':''}>${m}</option>`).join('')}</select></div>
     <div class="frow"><label>중량 (kg)</label><input type="number" step="0.01" id="edK" value="${l.kg}"></div>
     <div class="frow"><label>증빙 사진 링크</label><input id="edPh" value="${esc(l.photo||'')}"></div>
     <div class="frow"><label>메모</label><input id="edMe" value="${esc(l.memo||'')}"></div>
@@ -1256,12 +1292,15 @@ let SHIPS_LIVE=null, SHIPS_LIVE_ERR='';
 function parseD(s){ const m=String(s||'').match(/(\d{4})[.\-\/\s]+(\d{1,2})[.\-\/\s]+(\d{1,2})/); return m? m[1]+'-'+m[2].padStart(2,'0')+'-'+m[3].padStart(2,'0') : ''; }
 function findCol(head,names){ return head.findIndex(h=>names.some(n=>String(h).replace(/\s/g,'').includes(n))); }
 let WEIGHTS={}; // 품목별 단위 무게(g)·원료 구분: {품목명:{g:, src:}}
-let SHEET_CFG=null; // {url, tabs, auto}
-const DEFAULT_SHEET={url:'https://docs.google.com/spreadsheets/d/17N0pKs2xbs8rQihDS3olCUF2gkq9lxq0eDBEZtOqnRw/edit',tabs:'25년도, 26년도',auto:true};
-async function loadMeta(){ try{ const s=await getDoc(doc(db,'internal','main')); const d=s.exists()?s.data():{}; WEIGHTS=d.weights||{}; SHEET_CFG=d.shipSheet||null; }catch(e){ WEIGHTS={}; } }
+let SHEET_CFG=null; // {url, auto}
+const DEFAULT_SHEET={url:'https://docs.google.com/spreadsheets/d/1fOivvVYYIDeiA06hKbyJyUA5JvhzY2OMuo5bEjAs6DE/edit?gid=1315899441#gid=1315899441',auto:true};
+async function loadMeta(){ try{ const s=await getDoc(doc(db,'internal','main')); const d=s.exists()?s.data():{}; WEIGHTS=d.weights||{}; SHEET_CFG=d.shipSheet||null;
+  // 빈 설정·구버전(판매 원본 시트) 설정은 새 집계 시트 기본값으로 대체
+  if(SHEET_CFG&&(!SHEET_CFG.url||/17N0pKs2xbs8rQihDS3olCUF2gkq9lxq0eDBEZtOqnRw/.test(SHEET_CFG.url))) SHEET_CFG=null;
+}catch(e){ WEIGHTS={}; } }
 async function saveWeights(){ await setDoc(doc(db,'internal','main'),{weights:WEIGHTS},{merge:true}); }
 async function saveSheetCfg(){
-  SHEET_CFG={url:$('shUrl').value.trim(),tabs:$('shTabs').value.trim(),auto:$('shAuto').checked};
+  SHEET_CFG={url:$('shUrl').value.trim(),auto:$('shAuto').checked};
   $('shOpen').href=SHEET_CFG.url||'#';
   try{ await setDoc(doc(db,'internal','main'),{shipSheet:SHEET_CFG},{merge:true}); }catch(e){}
 }
@@ -1293,54 +1332,47 @@ function parseD2(s,yr){
   if(m) return yr+'-'+m[1].padStart(2,'0')+'-'+m[2].padStart(2,'0');
   return '';
 }
+function gidOf(u){ const m=String(u||'').match(/[#?&]gid=(\d+)/); return m?m[1]:''; }
+let SHIP_NODATE=0;
 async function loadShipsLive(force){
   if(SHIPS_LIVE&&!force) return SHIPS_LIVE;
-  SHIPS_LIVE=[]; SHIPS_LIVE_ERR=''; SHIP_FAILTABS=[]; SHIP_TABSTATS=[]; SHIP_SKIP=0;
+  SHIPS_LIVE=[]; SHIPS_LIVE_ERR=''; SHIP_SKIP=0; SHIP_NODATE=0;
   try{
     await loadMeta();
     const cfg=SHEET_CFG||DEFAULT_SHEET;
     const id=sheetIdOf(cfg.url); if(!id) throw new Error('시트 URL을 확인해 주세요');
-    const tabs=String(cfg.tabs||'').split(',').map(s=>s.trim()).filter(Boolean);
-    if(!tabs.length) throw new Error('탭 이름을 입력해 주세요');
-    for(const tab of tabs){
-      try{
-        const res=await fetch('https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(tab));
-        if(!res.ok) throw new Error('bad');
-        const rows=parseCSV(await res.text());
-        if(rows.length<2){ SHIP_FAILTABS.push(tab); continue; }
-        // 헤더 행 탐색 (제목 줄이 위에 있어도 인식)
-        let hi=-1;
-        for(let i=0;i<Math.min(rows.length,5);i++){ if(findCol(rows[i],['출고일','발송일','납품일','주문일','날짜','일자'])>=0){ hi=i; break; } }
-        if(hi<0){ SHIP_FAILTABS.push(tab+' (날짜 컬럼 없음)'); continue; }
-        const head=rows[hi], yr=tabYear(tab);
-        const cd=findCol(head,['출고일','발송일','납품일','주문일','날짜','일자']);
-        const ci=findCol(head,['품목','상품명','제품명','품명','제품']);
-        const cq=findCol(head,['수량','개수']);
-        const ck=findCol(head,['원료kg','원료(kg)','원료중량','투입원료','중량(kg)']);
-        const cs=findCol(head,['원료구분']);
-        const cok=findCol(head,['출고완료','출고여부']);
-        const cx=findCol(head,['취소/반품','취소','반품']);
-        let cnt=0;
-        rows.slice(hi+1).forEach(r=>{
-          if(cok>=0&&/^false$/i.test(String(r[cok]).trim())) {SHIP_SKIP++;return;} // 미출고 제외
-          if(cx>=0&&/^true$/i.test(String(r[cx]).trim())) {SHIP_SKIP++;return;} // 취소/반품 제외
-          const d=parseD2(r[cd],yr); if(!d) return;
-          const item=ci>=0?normItem(r[ci]):'';
-          const qty=cq>=0?(+String(r[cq]).replace(/[^\d.]/g,'')||0):0;
-          let kg=ck>=0?(+String(r[ck]).replace(/[^\d.]/g,'')||0):0;
-          let src=(cs>=0&&r[cs])?String(r[cs]):'';
-          const w=WEIGHTS[item];
-          if(!kg&&w&&w.g&&qty) kg=Math.round(qty*w.g)/1000; // 무게표로 자동 계산
-          if(!src) src=(w&&w.src)||'티끌 수거분';
-          SHIPS_LIVE.push({tab,d,item,qty,kg,src,auto:!!(w&&w.g&&(ck<0||!r[ck]))});
-          cnt++;
-        });
-        SHIP_TABSTATS.push(tab+' '+cnt+'건');
-      }catch(e){ SHIP_FAILTABS.push(tab); }
-    }
-    if(SHIP_FAILTABS.length===tabs.length&&tabs.length) throw new Error('시트를 읽지 못했어요 — 시트 공유가 "링크가 있는 모든 사용자 · 뷰어"인지, 탭 이름('+SHIP_FAILTABS.join(', ')+')이 정확한지 확인해 주세요');
+    const gid=gidOf(cfg.url);
+    const res=await fetch('https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:csv'+(gid?'&gid='+gid:''));
+    if(!res.ok) throw new Error('시트를 읽지 못했어요 — 시트 공유가 "링크가 있는 사용자 · 뷰어"인지 확인해 주세요');
+    const rows=parseCSV(await res.text());
+    if(rows.length<2) throw new Error('시트에 데이터가 아직 없어요');
+    // 헤더 행 탐색 (제목 줄이 위에 있어도 인식)
+    let hi=-1;
+    for(let i=0;i<Math.min(rows.length,5);i++){ if(findCol(rows[i],['출고일','발송일','납품일','주문일','날짜','일자'])>=0){ hi=i; break; } }
+    if(hi<0) throw new Error('날짜 컬럼(발송일 등)을 찾지 못했어요 — 시트 1행에 컬럼 제목이 있는지 확인해 주세요');
+    const head=rows[hi];
+    const cd=findCol(head,['출고일','발송일','납품일','주문일','날짜','일자']);
+    const cy=findCol(head,['연도','년도']);
+    const ci=findCol(head,['품목','상품명','제품명','품명','제품']);
+    const cq=findCol(head,['수량','개수']);
+    const ck=findCol(head,['원료kg','원료(kg)','원료중량','투입원료','중량(kg)']);
+    const cok=findCol(head,['출고완료','출고여부']);
+    const cx=findCol(head,['취소/반품','취소','반품']);
+    rows.slice(hi+1).forEach(r=>{
+      if(cok>=0&&/^false$/i.test(String(r[cok]).trim())) {SHIP_SKIP++;return;} // 미출고 제외
+      if(cx>=0&&/^true$/i.test(String(r[cx]).trim())) {SHIP_SKIP++;return;} // 취소/반품 제외
+      const yr=cy>=0?String(r[cy]).replace(/\D/g,'').padStart(4,'20').slice(0,4):'';
+      const d=parseD2(r[cd],yr||String(thisYear));
+      if(!d){ if(String(r[cd]).trim()) SHIP_NODATE++; return; }
+      const item=ci>=0?normItem(r[ci]):'';
+      const qty=cq>=0?(+String(r[cq]).replace(/[^\d.]/g,'')||0):0;
+      let kg=ck>=0?(+String(r[ck]).replace(/[^\d.]/g,'')||0):0;
+      const w=WEIGHTS[item];
+      if(!kg&&w&&w.g&&qty) kg=Math.round(qty*w.g)/1000; // 무게표(g)로 자동 계산
+      SHIPS_LIVE.push({d,item,qty,kg,auto:!!(w&&w.g&&(ck<0||!r[ck]))});
+    });
     SHIPS_LIVE.sort((a,b)=>a.d<b.d?1:-1);
-  }catch(e){ SHIPS_LIVE_ERR=/Failed to fetch/i.test(e.message||'')?'시트에 연결하지 못했어요 — 시트 공유를 "링크가 있는 모든 사용자 · 뷰어"로 설정해 주세요':(e.message||'오류'); }
+  }catch(e){ SHIPS_LIVE_ERR=/Failed to fetch/i.test(e.message||'')?'시트에 연결하지 못했어요 — 시트 공유를 "링크가 있는 사용자 · 뷰어"로 설정해 주세요':(e.message||'오류'); }
   return SHIPS_LIVE;
 }
 async function drawShipLive(force){
@@ -1350,13 +1382,12 @@ async function drawShipLive(force){
   const t=new Date(), hm=String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0');
   const kg=live.reduce((s,x)=>s+x.kg,0), noKg=live.filter(x=>!x.kg).length;
   $('shLiveMsg').textContent='✔ '+hm+' 동기화 · '+live.length+'건'
-    +(SHIP_TABSTATS.length?' ('+SHIP_TABSTATS.join(' · ')+')':'')
     +(SHIP_SKIP?' · 취소·미출고 '+SHIP_SKIP+'건 제외':'')
-    +(SHIP_FAILTABS.length?' · ⚠️ 읽지 못한 탭: '+SHIP_FAILTABS.join(', '):'')
-    +(noKg?' · ⚠️ 무게 미확인 '+noKg+'건 — 아래 제품 무게표에 단위 무게를 등록해 주세요':'');
-  $('shLiveSum').innerHTML=`<span class="chip g">원료 ${fmt(kg)} kg</span> <span class="chip b">${[...new Set(live.map(x=>x.tab))].join(' · ')||'—'}</span>${noKg?` <span class="chip y">무게 미확인 ${noKg}건</span>`:''}`;
-  $('shLive').innerHTML='<tr><th>탭</th><th>출고일</th><th>품목</th><th style="text-align:right">수량</th><th style="text-align:right">원료 kg</th><th>원료 구분</th></tr>'+
-    live.slice(0,200).map(x=>`<tr><td class="hint">${esc(x.tab)}</td><td class="num">${esc(x.d)}</td><td>${esc(x.item)}</td><td class="num" style="text-align:right">${fmt(x.qty)}</td><td class="num" style="text-align:right">${x.kg?fmt(x.kg)+(x.auto?' <span class="hint">자동</span>':''):'<span class="chip y">무게표 필요</span>'}</td><td>${esc(x.src)}</td></tr>`).join('');
+    +(SHIP_NODATE?' · ⚠️ 날짜 인식 실패 '+SHIP_NODATE+'건 (연도가 포함된 날짜인지 확인)':'')
+    +(noKg?' · ⚠️ 무게 미확인 '+noKg+'건 — 아래 제품 무게표에 단위 무게(g)를 등록해 주세요':'');
+  $('shLiveSum').innerHTML=`<span class="chip g">원료 ${fmt(kg)} kg</span> <span class="chip b">누적 ${fmt(live.length)}건</span>${noKg?` <span class="chip y">무게 미확인 ${noKg}건</span>`:''}`;
+  $('shLive').innerHTML='<tr><th>출고일</th><th>품목</th><th style="text-align:right">수량</th><th style="text-align:right">원료 kg</th></tr>'+
+    live.slice(0,300).map(x=>`<tr><td class="num">${esc(x.d)}</td><td>${esc(x.item)}</td><td class="num" style="text-align:right">${fmt(x.qty)}</td><td class="num" style="text-align:right">${x.kg?fmt(x.kg)+(x.auto?' <span class="hint">자동</span>':''):'<span class="chip y">무게표 필요</span>'}</td></tr>`).join('');
   drawWeights(live);
 }
 let AUTO_TIMER=null;
@@ -1365,16 +1396,15 @@ function setAuto(on){ clearInterval(AUTO_TIMER); AUTO_TIMER=null;
 function drawWeights(live){
   const items=[...new Set([...(live||[]).map(x=>x.item).filter(Boolean),...Object.keys(WEIGHTS)])].sort();
   if(!items.length){ $('wtable').innerHTML='<tr><td style="color:var(--ink2)">시트 연동 후 품목이 여기에 자동으로 나타납니다</td></tr>'; return; }
-  $('wtable').innerHTML='<tr><th>품목</th><th style="text-align:right">1개당 무게 (g)</th><th>원료 구분</th></tr>'+
-    items.map((it,i)=>{const w=WEIGHTS[it]||{};
+  $('wtable').innerHTML='<tr><th>품목</th><th style="text-align:right">1개당 무게 — g(그램)</th><th style="text-align:right">kg 환산</th></tr>'+
+    items.map(it=>{const w=WEIGHTS[it]||{};
       return `<tr><td>${esc(it)}</td>
-        <td style="text-align:right"><input type="number" step="1" data-wg="${esc(it)}" value="${w.g||''}" style="width:110px;text-align:right" placeholder="예: 25"></td>
-        <td><select data-ws="${esc(it)}" style="width:150px">${['티끌 수거분','외부 재생원료','혼합'].map(s=>`<option ${s===(w.src||'티끌 수거분')?'selected':''}>${s}</option>`).join('')}</select></td></tr>`;}).join('');
+        <td style="text-align:right"><input type="number" step="1" min="0" data-wg="${esc(it)}" value="${w.g||''}" style="width:120px;text-align:right" placeholder="예: 25 (g)"></td>
+        <td class="num" style="text-align:right;color:var(--ink2)">${w.g?(w.g/1000)+' kg':'—'}</td></tr>`;}).join('');
   $('wSave').onclick=async()=>{
     document.querySelectorAll('[data-wg]').forEach(inp=>{
       const it=inp.dataset.wg, g=+inp.value||0;
-      const src=document.querySelector(`[data-ws="${CSS.escape(it)}"]`)?.value||'티끌 수거분';
-      if(g>0) WEIGHTS[it]={g,src}; else delete WEIGHTS[it];
+      if(g>0) WEIGHTS[it]={g}; else delete WEIGHTS[it];
     });
     try{ await saveWeights(); $('wMsg').textContent='✅ 저장됐어요 — 원료량을 다시 계산합니다.'; drawShipLive(true); }
     catch(e){ $('wMsg').textContent='저장 실패: '+(e.code||e.message); }
@@ -1383,7 +1413,7 @@ function drawWeights(live){
 async function renderShip(){
   await loadMeta();
   const cfg=SHEET_CFG||DEFAULT_SHEET;
-  $('shUrl').value=cfg.url||''; $('shTabs').value=cfg.tabs||''; $('shAuto').checked=cfg.auto!==false;
+  $('shUrl').value=cfg.url||''; $('shAuto').checked=cfg.auto!==false;
   $('shOpen').href=cfg.url||'#';
   $('shSync').onclick=async()=>{ await saveSheetCfg(); drawShipLive(true); };
   $('shAuto').onchange=async()=>{ await saveSheetCfg(); setAuto($('shAuto').checked); };
@@ -1555,6 +1585,25 @@ async function renderPartnersAdmin(){
   document.querySelectorAll('[data-pe]').forEach(b=>b.onclick=()=>partnerForm(PARTNERS.find(p=>p.id===b.dataset.pe)));
   document.querySelectorAll('[data-rc]').forEach(b=>b.onclick=async()=>{b.textContent='…';await recalcPartner(b.dataset.rc);b.textContent='완료';renderPartnersAdmin();});
   $('paAdd').onclick=()=>partnerForm(null);
+  $('paImport').onchange=async e=>{
+    const f=e.target.files[0]; e.target.value=''; if(!f) return;
+    const rows=parseCSV(await f.text()).filter(r=>r.length>=2);
+    const body=rows.filter(r=>String(r[0]).trim()&&!/파트너ID/i.test(r[0]));
+    if(!body.length){ alert('가져올 행이 없어요 — "파트너_가져오기.csv" 파일인지 확인해 주세요.'); return; }
+    if(!confirm(body.length+'곳의 파트너 정보를 가져올까요? (기존 파트너는 이름·속성·지역만 갱신, 실적은 유지)')) return;
+    let n=0;
+    for(const r of body){
+      const pid=String(r[0]).trim();
+      try{
+        await setDoc(doc(db,'partners',pid),{ name:String(r[1]||'').trim(), type:String(r[2]||'').trim(),
+          region:String(r[3]||'').trim(), joined:String(r[4]||'').trim() },{merge:true});
+        const snap=await getDoc(doc(db,'partners',pid));
+        if(!snap.data().months) await setDoc(doc(db,'partners',pid),{months:{},total:snap.data().total||0,last:snap.data().last||'',created:Date.now()},{merge:true});
+        n++;
+      }catch(e){}
+    }
+    alert('✅ 파트너 '+n+'곳 가져오기 완료'); renderPartnersAdmin();
+  };
   // 신청 접수함
   try{
     const s=await getDocs(query(collection(db,'applications'),orderBy('created','desc')));
