@@ -1279,10 +1279,23 @@ function parseCSV(text){
   if(cur!==''||row.length){ row.push(cur); rows.push(row); }
   return rows;
 }
-let SHIP_FAILTABS=[];
+let SHIP_FAILTABS=[],SHIP_TABSTATS=[],SHIP_SKIP=0;
+function tabYear(tab){
+  let m=String(tab).match(/20\d{2}/); if(m) return m[0];
+  m=String(tab).match(/\d{2}/); if(m&&+m[0]>=20&&+m[0]<=39) return '20'+m[0];
+  return String(thisYear);
+}
+function parseD2(s,yr){
+  s=String(s||'').trim();
+  let m=s.match(/(\d{4})[.\-\/\s]+(\d{1,2})[.\-\/\s]+(\d{1,2})/);
+  if(m) return m[1]+'-'+m[2].padStart(2,'0')+'-'+m[3].padStart(2,'0');
+  m=s.match(/^(\d{1,2})[.\-\/](\d{1,2})/); // "01/05"처럼 연도가 없으면 탭 이름의 연도 사용
+  if(m) return yr+'-'+m[1].padStart(2,'0')+'-'+m[2].padStart(2,'0');
+  return '';
+}
 async function loadShipsLive(force){
   if(SHIPS_LIVE&&!force) return SHIPS_LIVE;
-  SHIPS_LIVE=[]; SHIPS_LIVE_ERR=''; SHIP_FAILTABS=[];
+  SHIPS_LIVE=[]; SHIPS_LIVE_ERR=''; SHIP_FAILTABS=[]; SHIP_TABSTATS=[]; SHIP_SKIP=0;
   try{
     await loadMeta();
     const cfg=SHEET_CFG||DEFAULT_SHEET;
@@ -1295,15 +1308,23 @@ async function loadShipsLive(force){
         if(!res.ok) throw new Error('bad');
         const rows=parseCSV(await res.text());
         if(rows.length<2){ SHIP_FAILTABS.push(tab); continue; }
-        const head=rows[0];
+        // 헤더 행 탐색 (제목 줄이 위에 있어도 인식)
+        let hi=-1;
+        for(let i=0;i<Math.min(rows.length,5);i++){ if(findCol(rows[i],['출고일','발송일','납품일','주문일','날짜','일자'])>=0){ hi=i; break; } }
+        if(hi<0){ SHIP_FAILTABS.push(tab+' (날짜 컬럼 없음)'); continue; }
+        const head=rows[hi], yr=tabYear(tab);
         const cd=findCol(head,['출고일','발송일','납품일','주문일','날짜','일자']);
         const ci=findCol(head,['품목','상품명','제품명','품명','제품']);
         const cq=findCol(head,['수량','개수']);
-        const ck=findCol(head,['원료kg','원료(kg)','원료중량','투입원료','중량(kg)','중량','kg']);
-        const cs=findCol(head,['원료구분','구분']);
-        if(cd<0){ SHIP_FAILTABS.push(tab+' (날짜 컬럼 없음)'); continue; }
-        rows.slice(1).forEach(r=>{
-          const d=parseD(r[cd]); if(!d) return;
+        const ck=findCol(head,['원료kg','원료(kg)','원료중량','투입원료','중량(kg)']);
+        const cs=findCol(head,['원료구분']);
+        const cok=findCol(head,['출고완료','출고여부']);
+        const cx=findCol(head,['취소/반품','취소','반품']);
+        let cnt=0;
+        rows.slice(hi+1).forEach(r=>{
+          if(cok>=0&&/^false$/i.test(String(r[cok]).trim())) {SHIP_SKIP++;return;} // 미출고 제외
+          if(cx>=0&&/^true$/i.test(String(r[cx]).trim())) {SHIP_SKIP++;return;} // 취소/반품 제외
+          const d=parseD2(r[cd],yr); if(!d) return;
           const item=ci>=0?normItem(r[ci]):'';
           const qty=cq>=0?(+String(r[cq]).replace(/[^\d.]/g,'')||0):0;
           let kg=ck>=0?(+String(r[ck]).replace(/[^\d.]/g,'')||0):0;
@@ -1312,7 +1333,9 @@ async function loadShipsLive(force){
           if(!kg&&w&&w.g&&qty) kg=Math.round(qty*w.g)/1000; // 무게표로 자동 계산
           if(!src) src=(w&&w.src)||'티끌 수거분';
           SHIPS_LIVE.push({tab,d,item,qty,kg,src,auto:!!(w&&w.g&&(ck<0||!r[ck]))});
+          cnt++;
         });
+        SHIP_TABSTATS.push(tab+' '+cnt+'건');
       }catch(e){ SHIP_FAILTABS.push(tab); }
     }
     if(SHIP_FAILTABS.length===tabs.length&&tabs.length) throw new Error('시트를 읽지 못했어요 — 시트 공유가 "링크가 있는 모든 사용자 · 뷰어"인지, 탭 이름('+SHIP_FAILTABS.join(', ')+')이 정확한지 확인해 주세요');
@@ -1327,6 +1350,8 @@ async function drawShipLive(force){
   const t=new Date(), hm=String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0');
   const kg=live.reduce((s,x)=>s+x.kg,0), noKg=live.filter(x=>!x.kg).length;
   $('shLiveMsg').textContent='✔ '+hm+' 동기화 · '+live.length+'건'
+    +(SHIP_TABSTATS.length?' ('+SHIP_TABSTATS.join(' · ')+')':'')
+    +(SHIP_SKIP?' · 취소·미출고 '+SHIP_SKIP+'건 제외':'')
     +(SHIP_FAILTABS.length?' · ⚠️ 읽지 못한 탭: '+SHIP_FAILTABS.join(', '):'')
     +(noKg?' · ⚠️ 무게 미확인 '+noKg+'건 — 아래 제품 무게표에 단위 무게를 등록해 주세요':'');
   $('shLiveSum').innerHTML=`<span class="chip g">원료 ${fmt(kg)} kg</span> <span class="chip b">${[...new Set(live.map(x=>x.tab))].join(' · ')||'—'}</span>${noKg?` <span class="chip y">무게 미확인 ${noKg}건</span>`:''}`;
