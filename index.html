@@ -149,6 +149,7 @@
       <a data-s="rental">🛋️ 렌탈·제작 안내 🌐</a>
     </nav>
     <div class="foot">
+      <div id="authbox" style="margin-bottom:10px">⚪ 내부 화면은 로그인 필요</div>
       🔒 내부 전용 (@lowlit.co)<br>🔗 전용 링크로만 열람<br>🌐 누구나 열람 (오픈)<br><br>
       UI Mockup v0.2 · 2026.07<br>데이터는 예시입니다
     </div>
@@ -729,14 +730,33 @@
       </div>
     </section>
 
+    <!-- ============ 로그인 게이트 (내부 전용) ============ -->
+    <section class="screen" id="lock">
+      <div class="htitle"><h1>내부 전용 화면</h1><span class="chip y">🔒 @lowlit.co</span></div>
+      <div class="sub">대시보드·입고·원장·리포트·문서 발급은 로우리트 구성원만 볼 수 있습니다.</div>
+      <div class="card" style="max-width:420px;text-align:center;padding:36px 24px">
+        <div style="font-size:36px;margin-bottom:12px">🔒</div>
+        <div style="font-weight:700;margin-bottom:16px">회사 Google 계정으로 로그인해 주세요</div>
+        <button class="btn" id="loginBtn">Google로 로그인 (@lowlit.co)</button>
+        <div class="hint" id="authMsg" style="margin-top:12px"></div>
+      </div>
+    </section>
+
   </main>
 </div>
 <script>
-// ── 화면 전환 ──
-function go(id){
-  document.querySelectorAll('.nav a').forEach(x=>x.classList.toggle('on', x.dataset.s===id));
+// ── 화면 전환 + 내부 화면 잠금 ──
+const INTERNAL = ['dash','intake','ledger','report','docs'];
+window.AUTH_OK = false; window.PENDING = null; window.CURRENT = 'dash';
+function show(id, navId){
+  document.querySelectorAll('.nav a').forEach(x=>x.classList.toggle('on', x.dataset.s===(navId||id)));
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id));
+  window.CURRENT = navId || id;
   window.scrollTo(0,0);
+}
+function go(id){
+  if(INTERNAL.includes(id) && !window.AUTH_OK){ window.PENDING = id; show('lock', id); return; }
+  show(id);
 }
 document.querySelectorAll('.nav a').forEach(a=>{
   a.addEventListener('click',()=>go(a.dataset.s));
@@ -818,8 +838,65 @@ function calc(){
   document.getElementById('cr3').textContent = '약 '+fmt(std/6.6)+'그루';
 }
 
-// 초기 렌더
-upd(); pupd(); calc();
+// 초기 렌더 — 로그인 전이므로 대시보드 대신 잠금 화면부터
+go('dash'); upd(); pupd(); calc();
+</script>
+<script type="module">
+// ── Firebase 인증 (@lowlit.co 전용 게이트) ──
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAd2BhYWgulPDmZON6G1uj47mGTCZYDxvU",
+  authDomain: "lowlit-impact.firebaseapp.com",
+  projectId: "lowlit-impact",
+  storageBucket: "lowlit-impact.firebasestorage.app",
+  messagingSenderId: "1025412036792",
+  appId: "1:1025412036792:web:f67e2b343948bc9ba89c4d",
+  measurementId: "G-BKF50E9KZS"
+};
+
+const box = document.getElementById('authbox');
+const msg = document.getElementById('authMsg');
+let auth;
+try {
+  const app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+} catch(e) {
+  msg.textContent = 'Firebase 초기화 실패: ' + e.message;
+}
+
+const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ hd: 'lowlit.co' }); // 계정 선택창에서 lowlit.co 계정 우선
+
+function applyAuth(u){
+  if (u && u.email && u.email.toLowerCase().endsWith('@lowlit.co')) {
+    window.AUTH_OK = true;
+    msg.textContent = '';
+    box.innerHTML = '🟢 ' + u.email + ' · <a id="logoutBtn" style="cursor:pointer;color:#d7e96b;text-decoration:underline">로그아웃</a>';
+    document.getElementById('logoutBtn').onclick = () => signOut(auth);
+    go(window.PENDING || window.CURRENT || 'dash');
+    window.PENDING = null;
+  } else {
+    if (u) { // 로그인은 됐지만 회사 계정이 아님
+      msg.textContent = '회사 계정(@lowlit.co)으로만 접근할 수 있어요. 다른 계정으로 다시 로그인해 주세요.';
+      signOut(auth);
+    }
+    window.AUTH_OK = false;
+    box.innerHTML = '⚪ 내부 화면은 로그인 필요';
+    if (INTERNAL.includes(window.CURRENT)) go(window.CURRENT); // 내부 화면 보고 있었으면 잠금
+  }
+}
+if (auth) onAuthStateChanged(auth, applyAuth);
+
+document.getElementById('loginBtn').addEventListener('click', async () => {
+  if (!auth) return;
+  try { await signInWithPopup(auth, provider); }
+  catch(e) {
+    msg.textContent = '로그인 실패: ' + (e.code || e.message) +
+      ' — 배포된 주소(lowlit-impact.vercel.app)에서 시도했는지, Firebase 승인된 도메인에 해당 주소를 추가했는지 확인해 주세요.';
+  }
+});
 </script>
 </body>
 </html>
