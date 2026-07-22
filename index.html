@@ -121,6 +121,36 @@
   .modalbg.show{display:flex}
   .modal{background:#fff;border-radius:14px;padding:22px;width:100%;max-width:460px}
   .modal h3{font-size:15px;margin-bottom:14px}
+  /* 로우리트 인증서 (티끌 테라조) */
+  .lc{max-width:640px;margin:0 auto;background:#fffdf8;border:1.5px solid var(--green);border-radius:2px;overflow:hidden}
+  .lc .band{height:8px;background:linear-gradient(90deg,var(--lime),var(--mint),var(--green2))}
+  .lc .terra{height:22px;background-color:#f4f2ea;background-image:
+    radial-gradient(circle 3.2px at 12px 11px,#2c5743 97%,transparent),
+    radial-gradient(circle 2.4px at 34px 6px,#6fcf97 97%,transparent),
+    radial-gradient(circle 3.8px at 55px 14px,#d7e96b 97%,transparent),
+    radial-gradient(circle 2.2px at 76px 8px,#1d3a2f 97%,transparent),
+    radial-gradient(circle 3px at 95px 15px,#e8b64c 97%,transparent),
+    radial-gradient(circle 2.6px at 112px 7px,#6fcf97 97%,transparent);
+    background-size:128px 22px;background-repeat:repeat-x}
+  .lc .body{padding:30px 38px 24px}
+  .lc .brand{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;letter-spacing:.14em;color:var(--ink2);font-weight:700}
+  .lc .brand b{color:var(--green)}
+  .lc h2{font-size:21px;letter-spacing:.42em;text-align:center;color:var(--green);margin:20px 0 2px;font-weight:800}
+  .lc .en{text-align:center;font-size:10px;color:#8b8676;letter-spacing:.2em;margin-bottom:18px}
+  .lc .heroNum{text-align:center;margin:14px 0 2px}
+  .lc .heroNum .n{font-size:46px;font-weight:800;letter-spacing:-.03em;color:var(--green)}
+  .lc .heroNum .u{font-size:16px;font-weight:700;color:var(--ink2)}
+  .lc .heroLab{text-align:center;font-size:11px;color:var(--ink2);font-weight:700;margin-bottom:14px}
+  .lc .impacts{display:flex;justify-content:center;gap:30px;margin:0 0 18px}
+  .lc .impacts div{text-align:center}
+  .lc .impacts .iv{font-weight:800;font-size:15px;color:var(--green2)}
+  .lc .impacts .il{font-size:10px;color:#8b8676}
+  .lc dl{display:grid;grid-template-columns:110px 1fr;row-gap:7px;font-size:12.5px;margin:0 0 14px;border-top:1px solid var(--line);padding-top:14px}
+  .lc dt{color:var(--ink2);font-weight:700}
+  .lc .quote{font-size:11.5px;color:var(--ink2);background:#f1f5ec;border-radius:8px;padding:10px 12px;line-height:1.7}
+  .lc .stamp{display:flex;justify-content:space-between;align-items:flex-end;margin-top:20px;font-size:11px;color:var(--ink2)}
+  .lc .serial2{font-family:var(--mono);font-size:10px;color:#8b8676}
+  .lc .foot2{font-size:9.5px;color:#8b8676;margin-top:14px;border-top:1px solid var(--line);padding-top:8px;line-height:1.6}
   /* 인쇄 */
   #printArea{display:none}
   @media print{
@@ -420,7 +450,7 @@
 
     <!-- ═══════════ 캠페인 리포트 (/c/아이디) ═══════════ -->
     <section class="screen" id="campaign">
-      <div class="htitle"><h1 id="cpTitle">캠페인 리포트</h1><span class="chip b" id="cpId"></span></div>
+      <div class="htitle"><h1 id="cpTitle">캠페인 리포트</h1><span class="chip b" id="cpId"></span><span class="chip g" id="cpDemoChip" style="display:none">예시 화면</span></div>
       <div class="sub" id="cpSub"></div>
       <div class="grid g4" style="margin-bottom:14px">
         <div class="card kpi"><div class="lab">총 수거량</div><div class="val" id="ck1">—</div><div class="d" id="cd1"></div></div>
@@ -465,10 +495,22 @@
     <!-- ═══════════ 관리자: 대시보드 ═══════════ -->
     <section class="screen" id="admin/dash">
       <div class="htitle"><h1>대시보드</h1><span class="chip y">🔒 내부 전용</span></div>
-      <div class="sub">모든 수치는 입고 원장에서 자동 집계됩니다.</div>
+      <div class="sub">모든 수치는 입고·출고 기록에서 자동 집계됩니다.</div>
+      <div class="card selbar" style="padding:12px 16px;margin-bottom:14px">
+        <span class="lab2">기간</span>
+        <select id="dy"></select>
+        <select id="dmn">
+          <option value="all" selected>전체 (연간)</option>
+          <option value="0">1월</option><option value="1">2월</option><option value="2">3월</option><option value="3">4월</option>
+          <option value="4">5월</option><option value="5">6월</option><option value="6">7월</option><option value="7">8월</option>
+          <option value="8">9월</option><option value="9">10월</option><option value="10">11월</option><option value="11">12월</option>
+        </select>
+        <span class="chip g" id="dPeriodKg">—</span>
+        <span class="more" style="margin-left:auto">아래 카드는 누적 기준, 차트는 선택 기간 기준</span>
+      </div>
       <div class="grid g4" style="margin-bottom:14px">
         <div class="card kpi"><div class="lab">누적 수거량</div><div class="val" id="dk1">—</div><div class="d" id="dd1"></div></div>
-        <div class="card kpi"><div class="lab">누적 제품화 사용량</div><div class="val" id="dk2">—</div><div class="d">수율 83% 적용</div></div>
+        <div class="card kpi"><div class="lab">누적 출고량 (제품화)</div><div class="val" id="dk2">—</div><div class="d" id="dd2">출고 관리 기준</div></div>
         <div class="card kpi"><div class="lab">탄소 감축 기여량 (보수)</div><div class="val" id="dk3">—</div><div class="d">계수 v2.0</div></div>
         <div class="card kpi"><div class="lab">증빙(사진) 보유 비율</div><div class="val" id="dk4">—</div><div class="prog"><i id="dk4bar" style="width:0%"></i></div></div>
       </div>
@@ -515,9 +557,9 @@
             <div class="seg" id="inWeigh"><span class="on">자체 저울</span><span>계근표</span><span>추정</span></div></div>
           <div class="frow"><label>전달 방법 <em>*</em></label>
             <div class="seg" id="inDeliv"><span class="on">차량 수거</span><span>택배</span><span>직접 전달</span></div></div>
-          <div class="frow"><label>증빙 사진 (구글 드라이브 링크)</label>
-            <input id="inPhoto" placeholder="드라이브에 올린 사진의 링크 붙여넣기">
-            <div class="hint">📁 <a href="https://drive.google.com/drive/folders/19_M8vwxstmCmoneRaJW9YRezLJj8_WAo" target="_blank" style="color:var(--green2)">증빙 사진 드라이브 폴더 열기</a> — 폰 드라이브 앱으로 사진 업로드 → 링크 복사 → 여기에 붙여넣기</div></div>
+          <div class="frow"><label>증빙 사진</label>
+            <input type="file" id="inFile" accept="image/*" capture="environment">
+            <div class="hint" id="inFileMsg">📷 촬영하거나 사진을 선택하면 자동으로 구글 드라이브에 업로드됩니다.</div></div>
           <div class="frow"><label>캠페인 귀속 (해당 시)</label><select id="inCampaign"><option value="">일반 (귀속 없음)</option></select></div>
           <div class="frow"><label>메모</label><input id="inMemo"></div>
           <button class="btn" style="width:100%" id="inSave">저장</button>
@@ -558,6 +600,28 @@
         <div style="overflow-x:auto">
         <table id="ltable"><tr><th>입고일</th><th>파트너</th><th>재질</th><th>형태</th><th style="text-align:right">kg</th><th>계량</th><th>전달</th><th>증빙</th><th>귀속</th><th>메모</th><th></th></tr></table>
         </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 관리자: 출고 관리 ═══════════ -->
+    <section class="screen" id="admin/ship">
+      <div class="htitle"><h1>출고 관리</h1><span class="chip y">🔒 내부 전용</span></div>
+      <div class="sub">판매·납품 완료된 제품 기준의 제품화 실적입니다. 수거량과 별개로 관리되며, 외부 재생원료 사용분도 함께 기록합니다.</div>
+      <div class="card selbar" style="padding:12px 16px;margin-bottom:14px">
+        <button class="btn s" id="shAdd">+ 출고 등록</button>
+        <label class="btn s o" style="cursor:pointer">CSV 가져오기<input type="file" id="shImport" accept=".csv" style="display:none"></label>
+        <span class="hint">CSV 형식: 날짜(YYYY-MM-DD), 품목, 수량, 원료kg, 원료구분(티끌 수거분/외부 재생원료/혼합), 메모</span>
+        <span style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn s o" id="shCsvBtn">CSV 내보내기 (엑셀)</button>
+          <button class="btn s o" onclick="window.print()">인쇄 / PDF</button>
+        </span>
+      </div>
+      <div class="card">
+        <div class="ctitle"><span id="shSummary">—</span></div>
+        <div style="overflow-x:auto">
+        <table id="shtable"></table>
+        </div>
+        <div class="note">lowlit-md(판매 관리)에서 판매리스트를 CSV로 내려받아 위 형식으로 정리해 가져오면 일괄 등록됩니다.</div>
       </div>
     </section>
 
@@ -691,6 +755,8 @@ const firebaseConfig = {
   appId: "1:1025412036792:web:f67e2b343948bc9ba89c4d"
 };
 const DRIVE_FOLDER = "https://drive.google.com/drive/folders/19_M8vwxstmCmoneRaJW9YRezLJj8_WAo";
+// ▼ 사진 자동 업로드용 Google Apps Script 웹앱 URL — 배포 후 여기에 붙여넣으세요 (가이드 참조)
+const GAS_UPLOAD_URL = "";
 const CO2=0.645, CO2STD=0.939, CAPS=400, YIELD=0.83, EF={pe:[2.96,1.09],pp:[1.84,0.53],hdpe:[1.89,0.56]};
 const $=s=>document.getElementById(s);
 const fmt=n=>(+n||0).toLocaleString('ko-KR',{maximumFractionDigits:1});
@@ -716,20 +782,22 @@ const NAV_PUBLIC=[
     ['pickers','🌱 티끌피커스 소개'],
     ['apply','✍️ 피커스 신청'],
     ['impact','🏪 파트너 임팩트 (예시)'],
-    ['story','🔍 제품 스토리 (예시)'],
     ['method','🧮 산정 방법론']]},
   {grp:'기업과 함께',items:[
-    ['rental','🛋️ 렌탈·제작 안내']]}
+    ['rental','🛋️ 렌탈·제작 안내'],
+    ['campaign-demo','🏢 캠페인 리포트 (예시)']]}
 ];
 const NAV_ADMIN=[
   {grp:'내부 관리 · 🔒',items:[
     ['admin/dash','📊 대시보드'],
     ['admin/intake','➕ 입고 등록'],
     ['admin/ledger','📒 입고 원장'],
+    ['admin/ship','📦 출고 관리'],
     ['admin/report','📅 월간·연간 리포트'],
     ['admin/docs','📄 문서 발급'],
     ['admin/partners','🗂️ 파트너 관리'],
-    ['admin/campaigns','🏢 캠페인 관리']]}
+    ['admin/campaigns','🏢 캠페인 관리'],
+    ['story','🔍 제품 스토리 (예시)']]}
 ];
 
 let CURRENT='';
@@ -762,7 +830,9 @@ async function route(){
   CURRENT=h; renderNav();
   if(h.startsWith('p/')){ show('partner'); await renderPartnerPage(h.slice(2),false); return; }
   if(h==='impact'){ show('partner'); await renderPartnerPage(null,true); return; }
-  if(h.startsWith('c/')){ show('campaign'); await renderCampaignPage(h.slice(2)); return; }
+  if(h==='campaign-demo'){ show('campaign'); await renderCampaignPage(null,true); return; }
+  if(h.startsWith('c/')){ show('campaign'); await renderCampaignPage(h.slice(2),false); return; }
+  if(h==='story'){ if(!ADMIN){ show('lock'); return; } show('story'); return; }
   if(h.startsWith('admin')){
     if(!ADMIN){ show('lock'); return; }
     const id=h==='admin'?'admin/dash':h;
@@ -772,6 +842,7 @@ async function route(){
       if(id==='admin/dash') await renderDash();
       if(id==='admin/intake') await renderIntake();
       if(id==='admin/ledger') await renderLedger();
+      if(id==='admin/ship') await renderShip();
       if(id==='admin/report') await renderReport();
       if(id==='admin/docs') await renderDocs();
       if(id==='admin/partners') await renderPartnersAdmin();
@@ -893,10 +964,18 @@ function pupd(){
   drawBars($('pbars'),$('px'),arr,m);
 }
 
-/* ─────────── 캠페인 리포트 (/c/아이디) ─────────── */
-async function renderCampaignPage(cid){
+/* ─────────── 캠페인 리포트 (/c/아이디 또는 예시) ─────────── */
+const DEMO_CAMPAIGN={ id:'C-2607', name:'임직원 자원순환 캠페인 (예시)', org:'○○전자', period:'2026년 6~7월',
+  target:300, participants:438, times:1204, sites:3, total:312,
+  lots:[{d:'2026-07-09',mat:'PP',kg:48.7},{d:'2026-07-02',mat:'PE/LDPE',kg:36.2},{d:'2026-06-25',mat:'PP',kg:52.4},
+        {d:'2026-06-18',mat:'PE/LDPE',kg:61},{d:'2026-06-11',mat:'PP',kg:57.3},{d:'2026-06-04',mat:'HDPE',kg:56.4}] };
+async function renderCampaignPage(cid,demo){
   let C=null;
-  try{ const snap=await getDoc(doc(db,'campaigns',cid)); if(snap.exists()) C={id:cid,...snap.data()}; }catch(e){}
+  if(demo){ C=DEMO_CAMPAIGN; $('cpDemoChip').style.display=''; }
+  else{
+    $('cpDemoChip').style.display='none';
+    try{ const snap=await getDoc(doc(db,'campaigns',cid)); if(snap.exists()) C={id:cid,...snap.data()}; }catch(e){}
+  }
   if(!C){ show('notfound'); return; }
   $('cpTitle').textContent=C.name||'캠페인 리포트';
   $('cpId').textContent=C.id;
@@ -918,16 +997,29 @@ async function renderCampaignPage(cid){
 
 /* ─────────── 관리자: 대시보드 ─────────── */
 async function renderDash(){
-  const lots=await loadAllLots(); await loadPartners();
+  const lots=await loadAllLots(); await loadPartners(); const ships=await loadShips();
   const total=lots.reduce((s,l)=>s+(+l.kg||0),0);
   $('dk1').innerHTML=fmt(total)+'<small> kg</small>'; $('dd1').textContent='로트 '+lots.length+'건 · 파트너 '+PARTNERS.length+'곳';
-  $('dk2').innerHTML=fmt(total*YIELD)+'<small> kg</small>';
+  const shipKg=ships.reduce((s,x)=>s+(+x.kg||0),0);
+  const shipTikkle=ships.filter(x=>x.src==='티끌 수거분').reduce((s,x)=>s+(+x.kg||0),0);
+  $('dk2').innerHTML=(ships.length?fmt(shipKg):'—')+'<small> kg</small>';
+  $('dd2').textContent=ships.length?('티끌 수거분 '+fmt(shipTikkle)+'kg · 외부 재생원료 '+fmt(shipKg-shipTikkle)+'kg'):'출고 관리에서 출고 기록을 등록하세요';
   $('dk3').innerHTML=fmt(total*CO2)+'<small> kgCO₂e</small>';
   const withPhoto=lots.filter(l=>l.photo).length, pct=lots.length?Math.round(withPhoto/lots.length*100):0;
   $('dk4').innerHTML=pct+'<small> %</small>'; $('dk4bar').style.width=pct+'%';
-  const y=String(thisYear); const arr=Array(12).fill(0);
-  lots.forEach(l=>{ if((l.d||'').startsWith(y+'-')) arr[+l.d.slice(5,7)-1]+=(+l.kg||0); });
-  $('dbarsLabel').textContent=y+'년'; drawBars($('dbars'),$('dx'),arr,'all');
+  const years=[...new Set(lots.map(l=>(l.d||'').slice(0,4)))].filter(Boolean).sort();
+  fillYearSel($('dy'),years.length?years:[String(thisYear)],years[years.length-1]||thisYear);
+  $('dy').onchange=dupd; $('dmn').onchange=dupd;
+  dupd();
+  function dupd(){
+    const y=$('dy').value,m=$('dmn').value;
+    const arr=Array(12).fill(0);
+    lots.forEach(l=>{ if((l.d||'').startsWith(y+'-')) arr[+l.d.slice(5,7)-1]+=(+l.kg||0); });
+    const kg=m==='all'?arr.reduce((s,v)=>s+v,0):arr[+m];
+    $('dbarsLabel').textContent=m==='all'?y+'년':y+'년 '+(+m+1)+'월';
+    $('dPeriodKg').textContent=(m==='all'?y+'년 연간 ':y+'년 '+(+m+1)+'월 ')+fmt(kg)+' kg';
+    drawBars($('dbars'),$('dx'),arr,m);
+  }
   const mats={}; lots.forEach(l=>{mats[l.mat||'기타']=(mats[l.mat||'기타']||0)+(+l.kg||0);});
   const colors={'PE/LDPE':'#2c5743','PP':'#6fcf97','HDPE':'#d7e96b','PLA':'#c9c4b4','기타':'#a8a693'};
   const ents=Object.entries(mats).sort((a,b)=>b[1]-a[1]);
@@ -941,9 +1033,33 @@ async function renderDash(){
 }
 
 /* ─────────── 관리자: 입고 등록 ─────────── */
+let UPLOADED_PHOTO='';
+async function uploadPhoto(file){
+  // 브라우저에서 리사이즈 후 Apps Script를 통해 드라이브 폴더에 저장
+  const img=new Image(); const url=URL.createObjectURL(file);
+  await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=url;});
+  const MAX=1600, sc=Math.min(1,MAX/Math.max(img.width,img.height));
+  const cv=document.createElement('canvas'); cv.width=Math.round(img.width*sc); cv.height=Math.round(img.height*sc);
+  cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height); URL.revokeObjectURL(url);
+  const b64=cv.toDataURL('image/jpeg',0.82).split(',')[1];
+  const name='입고증빙_'+new Date().toISOString().slice(0,10)+'_'+Date.now()%100000+'.jpg';
+  const res=await fetch(GAS_UPLOAD_URL,{method:'POST',body:JSON.stringify({name,data:b64})});
+  const j=await res.json();
+  if(!j.url) throw new Error(j.error||'업로드 응답 오류');
+  return j.url;
+}
 async function renderIntake(){
   await loadPartners(); await loadCampaigns();
   $('inDate').value=new Date().toISOString().slice(0,10);
+  UPLOADED_PHOTO='';
+  $('inFile').value='';
+  $('inFile').onchange=async e=>{
+    const f=e.target.files[0]; if(!f) return;
+    if(!GAS_UPLOAD_URL){ $('inFileMsg').innerHTML='⚠️ 드라이브 자동 업로드가 아직 연결되지 않았어요. <a href="'+DRIVE_FOLDER+'" target="_blank" style="color:var(--green2)">폴더에 직접 업로드</a> 후 저장하면 사진 없이 기록되고, 연결 방법은 가이드를 확인해 주세요.'; return; }
+    $('inFileMsg').textContent='⏳ 드라이브에 업로드 중…';
+    try{ UPLOADED_PHOTO=await uploadPhoto(f); $('inFileMsg').innerHTML='✅ 업로드 완료 — <a href="'+esc(UPLOADED_PHOTO)+'" target="_blank" style="color:var(--green2)">사진 열기</a>'; }
+    catch(err){ UPLOADED_PHOTO=''; $('inFileMsg').textContent='업로드 실패: '+err.message+' — 다시 시도해 주세요.'; }
+  };
   $('inPartner').innerHTML=PARTNERS.map(p=>`<option value="${p.id}">${esc(p.name)} (${esc(p.type||'')})</option>`).join('')||'<option value="">파트너를 먼저 등록하세요</option>';
   $('inCampaign').innerHTML='<option value="">일반 (귀속 없음)</option>'+CAMPAIGNS.map(c=>`<option value="${c.id}">${esc(c.name)} (${c.id})</option>`).join('');
   refreshRecent();
@@ -955,12 +1071,13 @@ async function renderIntake(){
     try{
       const p=PARTNERS.find(x=>x.id===pid);
       await addDoc(lotsCol(),{ d:$('inDate').value, pid, pname:p?.name||'', mat:segVal('inMat'), form:segVal('inForm'),
-        kg, weigh:segVal('inWeigh'), delivery:segVal('inDeliv'), photo:$('inPhoto').value.trim(),
+        kg, weigh:segVal('inWeigh'), delivery:segVal('inDeliv'), photo:UPLOADED_PHOTO,
         cid:$('inCampaign').value, memo:$('inMemo').value.trim(), created:Date.now() });
       invalidate();
       await recalcPartner(pid); if($('inCampaign').value) await recalcCampaign($('inCampaign').value);
       $('inMsg').textContent='✅ 저장되었습니다. 파트너 실적이 갱신되었어요.';
-      $('inKg').value='';$('inPhoto').value='';$('inMemo').value='';
+      $('inKg').value='';$('inMemo').value='';$('inFile').value='';UPLOADED_PHOTO='';
+      $('inFileMsg').textContent='📷 촬영하거나 사진을 선택하면 자동으로 구글 드라이브에 업로드됩니다.';
       refreshRecent();
     }catch(e){ $('inMsg').textContent='저장 실패: '+(e.code||e.message); }
     $('inSave').disabled=false;
@@ -1044,6 +1161,63 @@ async function delLot(id){
   catch(e){ alert('삭제 실패: '+(e.code||e.message)); }
 }
 
+/* ─────────── 관리자: 출고 관리 ─────────── */
+const shipsCol=()=>collection(db,'internal','main','ship');
+let SHIPS=null;
+async function loadShips(force){ if(SHIPS&&!force) return SHIPS;
+  try{ const s=await getDocs(query(shipsCol(),orderBy('d','desc'))); SHIPS=s.docs.map(d=>({id:d.id,...d.data()})); }catch(e){ SHIPS=[]; }
+  return SHIPS; }
+async function renderShip(){
+  const ships=await loadShips(true);
+  const kg=ships.reduce((s,x)=>s+(+x.kg||0),0), tik=ships.filter(x=>x.src==='티끌 수거분').reduce((s,x)=>s+(+x.kg||0),0);
+  $('shSummary').innerHTML=`전체 ${ships.length}건 <span class="chip g">원료 ${fmt(kg)} kg</span> <span class="chip b">티끌 수거분 ${fmt(tik)} kg</span> <span class="chip y">외부·혼합 ${fmt(kg-tik)} kg</span>`;
+  $('shtable').innerHTML='<tr><th>출고일</th><th>품목</th><th style="text-align:right">수량</th><th style="text-align:right">원료 kg</th><th>원료 구분</th><th>메모</th><th></th></tr>'+
+    (ships.length?ships.map(x=>`<tr><td class="num">${esc(x.d)}</td><td>${esc(x.item)}</td><td class="num" style="text-align:right">${fmt(x.qty)}</td><td class="num" style="text-align:right">${fmt(x.kg)}</td>
+      <td>${esc(x.src||'')}</td><td class="hint">${esc(x.note||'')}</td>
+      <td style="white-space:nowrap"><button class="btn s o" data-she="${x.id}">✏️</button> <button class="btn s r" data-shx="${x.id}">🗑</button></td></tr>`).join(''):
+      '<tr><td colspan="7" style="color:var(--ink2)">출고 기록이 없습니다 — "+ 출고 등록" 또는 CSV 가져오기로 시작하세요</td></tr>');
+  document.querySelectorAll('[data-she]').forEach(b=>b.onclick=()=>shipForm(ships.find(x=>x.id===b.dataset.she)));
+  document.querySelectorAll('[data-shx]').forEach(b=>b.onclick=async()=>{ if(confirm('출고 기록을 삭제할까요?')){ await deleteDoc(doc(db,'internal','main','ship',b.dataset.shx)); renderShip(); } });
+  $('shAdd').onclick=()=>shipForm(null);
+  $('shCsvBtn').onclick=()=>downloadCSV('출고내역.csv',[['출고일','품목','수량','원료kg','원료구분','메모'],...ships.map(x=>[x.d,x.item,x.qty,x.kg,x.src,x.note])]);
+  $('shImport').onchange=async e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const text=await f.text();
+    const rows=text.replace(/\r/g,'').split('\n').map(r=>r.split(',').map(c=>c.replace(/^"|"$/g,'').trim())).filter(r=>r.length>=4&&r[0]);
+    const body=rows.filter(r=>/^\d{4}-\d{2}-\d{2}/.test(r[0]));
+    if(!body.length){ alert('날짜(YYYY-MM-DD)로 시작하는 행을 찾지 못했어요. CSV 형식을 확인해 주세요.'); e.target.value=''; return; }
+    if(!confirm(body.length+'건을 가져올까요?')){ e.target.value=''; return; }
+    for(const r of body){
+      await addDoc(shipsCol(),{d:r[0],item:r[1]||'',qty:+r[2]||0,kg:+r[3]||0,src:r[4]||'티끌 수거분',note:r[5]||'',created:Date.now()});
+    }
+    e.target.value=''; renderShip();
+  };
+}
+function shipForm(x){
+  const isNew=!x;
+  modal(`<h3>${isNew?'출고 등록':'출고 수정'}</h3>
+    <div class="frow"><label>출고일 <em>*</em></label><input type="date" id="sfD" value="${esc(x?.d||new Date().toISOString().slice(0,10))}"></div>
+    <div class="frow"><label>품목 <em>*</em></label><input id="sfItem" value="${esc(x?.item||'')}" placeholder="예: 코스터 포레스트 그린"></div>
+    <div class="frow"><label>수량</label><input type="number" id="sfQty" value="${x?.qty||''}"></div>
+    <div class="frow"><label>투입 원료 (kg) <em>*</em></label><input type="number" step="0.01" id="sfKg" value="${x?.kg||''}"></div>
+    <div class="frow"><label>원료 구분</label><select id="sfSrc">${['티끌 수거분','외부 재생원료','혼합'].map(s=>`<option ${s===(x?.src||'티끌 수거분')?'selected':''}>${s}</option>`).join('')}</select></div>
+    <div class="frow"><label>메모</label><input id="sfNote" value="${esc(x?.note||'')}" placeholder="채널, 납품처 등"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn o" onclick="closeModal()">취소</button>
+      <button class="btn" id="sfSave">저장</button>
+    </div>`);
+  $('sfSave').onclick=async()=>{
+    const d=$('sfD').value,item=$('sfItem').value.trim(),kg=+$('sfKg').value;
+    if(!d||!item||!kg){alert('출고일·품목·원료 kg을 입력하세요');return;}
+    const data={d,item,qty:+$('sfQty').value||0,kg,src:$('sfSrc').value,note:$('sfNote').value.trim()};
+    try{
+      if(isNew) await addDoc(shipsCol(),{...data,created:Date.now()});
+      else await updateDoc(doc(db,'internal','main','ship',x.id),data);
+      closeModal(); renderShip();
+    }catch(e){ alert('저장 실패: '+(e.code||e.message)); }
+  };
+}
+
 /* ─────────── 관리자: 월간·연간 리포트 ─────────── */
 async function renderReport(){
   const lots=await loadAllLots();
@@ -1085,16 +1259,28 @@ async function renderDocs(){
   $('dcMake').onclick=()=>{
     const l=lots.find(x=>x.id===$('dcLot').value); if(!l) return;
     const serial='LWL-DC-'+l.d.replace(/-/g,'').slice(2)+'-'+l.id.slice(0,4).toUpperCase();
-    printDoc(`<div class="cert"><div class="serial">No. ${serial}</div>
-      <h2>기 증 확 인 서</h2><div class="sub2">CERTIFICATE OF DONATION</div>
-      <dl><dt>기증자</dt><dd><b>${esc(l.pname)}</b></dd>
-      <dt>수거 일자</dt><dd>${esc(l.d)} · ${esc(l.delivery||'')}</dd>
-      <dt>품목</dt><dd>${esc(l.mat)} ${esc(l.form||'')} (post-consumer)</dd>
-      <dt>중량</dt><dd><b>${fmt(l.kg)} kg</b> — ${esc(l.weigh||'')} 실측${l.photo?' (사진 증빙)':''}</dd></dl>
-      <div style="font-size:11.5px;color:#4a5c53">위 폐플라스틱이 로우리트콜렉티브에 기증되어 자원순환 공정에 투입되었음을 확인합니다.</div>
+    const today=new Date().toISOString().slice(0,10).replace(/-/g,'. ');
+    printDoc(`<div class="lc"><div class="band"></div><div class="terra"></div><div class="body">
+      <div class="brand"><span><b>LOWLIT</b> COLLECTIVE · IMPACT LEDGER</span><span class="serial2">No. ${serial}</span></div>
+      <h2>기증확인서</h2><div class="en">CERTIFICATE OF DONATION</div>
+      <div class="heroNum"><span class="n">${fmt(l.kg)}</span> <span class="u">kg</span></div>
+      <div class="heroLab">${esc(l.pname)} 님이 순환시킨 티끌 플라스틱</div>
+      <div class="impacts">
+        <div><div class="iv">−${fmt(l.kg*CO2)} kgCO₂e</div><div class="il">탄소 감축 기여량 (보수)</div></div>
+        <div><div class="iv">약 ${fmt(Math.round(l.kg*CAPS))}개</div><div class="il">병뚜껑 환산</div></div>
+      </div>
+      <dl>
+        <dt>기증자</dt><dd><b>${esc(l.pname)}</b></dd>
+        <dt>수거 일자</dt><dd>${esc(l.d)} · ${esc(l.delivery||'')}</dd>
+        <dt>품목</dt><dd>${esc(l.mat)} ${esc(l.form||'')} (post-consumer)</dd>
+        <dt>계량</dt><dd>${esc(l.weigh||'')} 실측${l.photo?' · 사진 증빙 보관':''}</dd>
+      </dl>
+      <div class="quote">위 티끌 플라스틱이 로우리트콜렉티브에 기증되어 자원순환 공정에 투입되었음을 확인합니다. 이 플라스틱은 새 제품으로 다시 태어나 500년의 순환 여정을 시작합니다.</div>
       <div class="stamp"><div>인계자 (서명) ______<br>인수자 (서명) ______</div>
-      <div style="text-align:right">${new Date().toISOString().slice(0,10).replace(/-/g,'. ')}.<br><b>로우리트콜렉티브 주식회사</b></div>
-      <div class="seal">LOWLIT<br>COLLECTIVE</div></div></div>`);
+      <div style="text-align:right">${today}.<br><b>로우리트콜렉티브 주식회사</b></div>
+      <div class="seal">LOWLIT<br>COLLECTIVE</div></div>
+      <div class="foot2">탄소 감축 기여량은 신재 원료 제품 대비 회피배출량으로, 로우리트 산정 방법론 v2.0(계수 출처 공개)에 따라 보수 기준으로 계산되었습니다. 본 확인서는 발급 대장에 기록되며 일련번호로 진위를 확인할 수 있습니다.</div>
+    </div><div class="terra"></div><div class="band"></div></div>`);
   };
   $('mcMake').onclick=()=>{
     const p=PARTNERS.find(x=>x.id===$('mcPartner').value); if(!p) return;
@@ -1106,17 +1292,23 @@ function makeMonthlyCert(p,ym,annual){
   const kg=annual? monthsToYearArr(p.months,y).reduce((s,v)=>s+v,0) : (p.months?.[ym]||0);
   const label=annual? y+'년 연간' : y+'년 '+(+ym.slice(5,7))+'월';
   const serial='LWL-PC-'+ym.replace('-','')+'-'+((p.id||p.name||'').toString().slice(0,4).toUpperCase());
-  printDoc(`<div class="cert"><div class="serial">No. ${serial}</div>
-    <h2>${annual?'연 간':'월 간'} 인 증 서</h2><div class="sub2">PARTNER IMPACT CERTIFICATE</div>
-    <dl><dt>파트너</dt><dd><b>${esc(p.name)}</b>${p.type?' ('+esc(p.type)+')':''}</dd>
-    <dt>대상 기간</dt><dd>${label}</dd>
-    <dt>기증량</dt><dd><b>${fmt(kg)} kg</b></dd>
-    <dt>탄소 감축 기여량</dt><dd><b>${fmt(kg*CO2)} kgCO₂e</b> (보수 기준 · 방법론 v2.0)</dd>
-    <dt>병뚜껑 환산</dt><dd>${fmt(Math.round(kg*CAPS))}개 (kg×400)</dd></dl>
-    <div style="font-size:11.5px;color:#4a5c53">위 파트너가 기간 내 티끌 플라스틱을 기증하여 자원순환과 탄소 감축에 기여하였음을 인증합니다.</div>
+  const today=new Date().toISOString().slice(0,10).replace(/-/g,'. ');
+  printDoc(`<div class="lc"><div class="band"></div><div class="terra"></div><div class="body">
+    <div class="brand"><span><b>LOWLIT</b> COLLECTIVE · IMPACT LEDGER</span><span class="serial2">No. ${serial}</span></div>
+    <h2>${annual?'연간 임팩트 인증서':'월간 임팩트 인증서'}</h2><div class="en">PARTNER IMPACT CERTIFICATE</div>
+    <div class="heroNum"><span class="n">${fmt(kg)}</span> <span class="u">kg</span></div>
+    <div class="heroLab">${label} · ${esc(p.name)}${p.type?' ('+esc(p.type)+')':''}</div>
+    <div class="impacts">
+      <div><div class="iv">−${fmt(kg*CO2)} kgCO₂e</div><div class="il">탄소 감축 기여량 (보수)</div></div>
+      <div><div class="iv">약 ${fmt(Math.round(kg*CAPS))}개</div><div class="il">병뚜껑 환산</div></div>
+      ${p.total?`<div><div class="iv">${fmt(p.total)} kg</div><div class="il">누적 기증량${p.joined?' ('+esc(p.joined)+'~)':''}</div></div>`:''}
+    </div>
+    <div class="quote">위 파트너가 기간 내 티끌 플라스틱을 기증하여 자원순환과 탄소 감축에 기여하였음을 인증합니다. 기증된 플라스틱은 로우리트의 순환 공정을 거쳐 새 제품으로 다시 태어납니다.</div>
     <div class="stamp"><div></div>
-    <div style="text-align:right">${new Date().toISOString().slice(0,10).replace(/-/g,'. ')}.<br><b>로우리트콜렉티브 주식회사</b></div>
-    <div class="seal">LOWLIT<br>COLLECTIVE</div></div></div>`);
+    <div style="text-align:right">${today}.<br><b>로우리트콜렉티브 주식회사</b></div>
+    <div class="seal">LOWLIT<br>COLLECTIVE</div></div>
+    <div class="foot2">탄소 감축 기여량은 신재 원료 제품 대비 회피배출량으로, 로우리트 산정 방법론 v2.0(계수 출처 공개)에 따라 보수 기준으로 계산되었습니다. 본 인증서는 발급 대장에 기록되며 일련번호로 진위를 확인할 수 있습니다.</div>
+  </div><div class="terra"></div><div class="band"></div></div>`);
 }
 function printDoc(html){ $('printArea').innerHTML=`<div style="max-width:640px;margin:0 auto">${html}</div>`; window.print(); }
 
@@ -1128,7 +1320,7 @@ async function renderPartnersAdmin(){
     (PARTNERS.length?PARTNERS.map(p=>{
       const url=BASE+'#/p/'+p.id;
       return `<tr><td><b>${esc(p.name)}</b></td><td>${esc(p.type||'')}</td>
-        <td class="num" style="font-size:11px">…#/p/${esc(p.id)} <button class="btn s o" data-cp="${url}">복사</button></td>
+        <td style="font-size:11px"><a class="num" href="${esc(url)}" style="color:var(--green2)">${esc(url)}</a> <button class="btn s o" data-cp="${url}">복사</button></td>
         <td class="num" style="text-align:right">${fmt(p.total||0)}</td><td class="num">${esc(p.last||'—')}</td>
         <td style="white-space:nowrap"><button class="btn s o" data-view="${p.id}">보기</button> <button class="btn s o" data-pe="${p.id}">✏️</button> <button class="btn s o" data-rc="${p.id}">재계산</button></td></tr>`;
     }).join(''):'<tr><td colspan="6" style="color:var(--ink2)">등록된 파트너가 없습니다 — "+ 새 파트너"로 시작하세요</td></tr>');
@@ -1181,7 +1373,7 @@ async function renderCampaignsAdmin(){
       const url=BASE+'#/c/'+c.id;
       return `<tr><td class="num">${esc(c.id)}</td><td><b>${esc(c.name)}</b></td><td>${esc(c.org||'')}</td><td class="num">${esc(c.period||'')}</td>
       <td class="num" style="text-align:right">${fmt(c.total||0)}</td>
-      <td class="num" style="font-size:11px">…#/c/${esc(c.id)} <button class="btn s o" data-cp="${url}">복사</button></td>
+      <td style="font-size:11px"><a class="num" href="${esc(url)}" style="color:var(--green2)">${esc(url)}</a> <button class="btn s o" data-cp="${url}">복사</button></td>
       <td style="white-space:nowrap"><button class="btn s o" data-cv="${c.id}">보기</button> <button class="btn s o" data-ce="${c.id}">✏️</button> <button class="btn s o" data-cr="${c.id}">재계산</button></td></tr>`;
     }).join(''):'<tr><td colspan="7" style="color:var(--ink2)">등록된 캠페인이 없습니다</td></tr>');
   document.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>{navigator.clipboard.writeText(b.dataset.cp);b.textContent='복사됨';setTimeout(()=>b.textContent='복사',1200);});
