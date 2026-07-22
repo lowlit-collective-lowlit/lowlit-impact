@@ -627,8 +627,19 @@
       <div class="htitle"><h1>출고 관리</h1><span class="chip y">🔒 내부 전용</span></div>
       <div class="sub">판매·납품 완료된 제품 기준의 제품화 실적입니다. 수거량과 별개로 관리되며, 외부 재생원료 사용분도 함께 기록합니다.</div>
       <div class="card" style="margin-bottom:14px">
-        <div class="ctitle">구글시트 연동 (실시간) <span style="display:flex;gap:6px"><button class="btn s o" id="shSync">↺ 새로고침</button><a class="btn s o" href="https://docs.google.com/spreadsheets/d/17N0pKs2xbs8rQihDS3olCUF2gkq9lxq0eDBEZtOqnRw/edit" target="_blank" style="text-decoration:none">시트 열기</a></span></div>
-        <div class="hint" id="shLiveMsg" style="margin-bottom:8px">화면을 열 때마다 출고 시트(25·26년도 탭)에서 최신 데이터를 불러옵니다.</div>
+        <div class="ctitle">구글시트 자동 동기화 <span class="more">출고 시트를 그대로 읽어옵니다 · 구글시트 → 페이지 단방향</span></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+          <input id="shUrl" placeholder="https://docs.google.com/spreadsheets/d/…" style="flex:1;min-width:260px">
+          <button class="btn s" id="shSync">🔄 구글시트에서 불러오기</button>
+          <label style="display:flex;align-items:center;gap:5px;font-size:12px;border:1.5px solid var(--line);border-radius:8px;padding:0 10px;cursor:pointer"><input type="checkbox" id="shAuto" style="width:auto"> 자동 (5분)</label>
+          <a class="btn s o" id="shOpen" href="#" target="_blank" style="text-decoration:none">시트 열기</a>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+          <span class="lab2">탭 이름</span><input id="shTabs" style="width:220px" placeholder="예: 25년도, 26년도">
+          <span class="hint">쉼표로 구분 · 시트 하단의 탭 이름과 정확히 같아야 해요</span>
+        </div>
+        <div class="hint" style="margin-bottom:8px">· 시트 공유를 <b>"링크가 있는 사용자 · 뷰어"</b>로 설정해야 페이지가 읽을 수 있습니다. (개인정보가 있다면 링크 관리에 주의하세요)</div>
+        <div class="hint" id="shLiveMsg" style="margin-bottom:8px"></div>
         <div id="shLiveSum" style="margin-bottom:10px"></div>
         <div style="max-height:300px;overflow-y:auto;overflow-x:auto">
         <table id="shLive"></table>
@@ -1245,56 +1256,87 @@ let SHIPS_LIVE=null, SHIPS_LIVE_ERR='';
 function parseD(s){ const m=String(s||'').match(/(\d{4})[.\-\/\s]+(\d{1,2})[.\-\/\s]+(\d{1,2})/); return m? m[1]+'-'+m[2].padStart(2,'0')+'-'+m[3].padStart(2,'0') : ''; }
 function findCol(head,names){ return head.findIndex(h=>names.some(n=>String(h).replace(/\s/g,'').includes(n))); }
 let WEIGHTS={}; // 품목별 단위 무게(g)·원료 구분: {품목명:{g:, src:}}
-async function loadWeights(){ try{ const s=await getDoc(doc(db,'internal','main')); WEIGHTS=(s.exists()&&s.data().weights)||{}; }catch(e){ WEIGHTS={}; } return WEIGHTS; }
+let SHEET_CFG=null; // {url, tabs, auto}
+const DEFAULT_SHEET={url:'https://docs.google.com/spreadsheets/d/17N0pKs2xbs8rQihDS3olCUF2gkq9lxq0eDBEZtOqnRw/edit',tabs:'25년도, 26년도',auto:true};
+async function loadMeta(){ try{ const s=await getDoc(doc(db,'internal','main')); const d=s.exists()?s.data():{}; WEIGHTS=d.weights||{}; SHEET_CFG=d.shipSheet||null; }catch(e){ WEIGHTS={}; } }
 async function saveWeights(){ await setDoc(doc(db,'internal','main'),{weights:WEIGHTS},{merge:true}); }
+async function saveSheetCfg(){
+  SHEET_CFG={url:$('shUrl').value.trim(),tabs:$('shTabs').value.trim(),auto:$('shAuto').checked};
+  $('shOpen').href=SHEET_CFG.url||'#';
+  try{ await setDoc(doc(db,'internal','main'),{shipSheet:SHEET_CFG},{merge:true}); }catch(e){}
+}
 function normItem(s){ return String(s||'').trim(); }
+function sheetIdOf(u){ const m=String(u||'').match(/\/d\/([a-zA-Z0-9_-]+)/); return m?m[1]:''; }
+function parseCSV(text){
+  const rows=[]; let row=[],cur='',q=false;
+  for(let i=0;i<text.length;i++){ const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+    else if(c==='"') q=true;
+    else if(c===','){ row.push(cur); cur=''; }
+    else if(c==='\n'){ row.push(cur); rows.push(row); row=[]; cur=''; }
+    else if(c!=='\r') cur+=c;
+  }
+  if(cur!==''||row.length){ row.push(cur); rows.push(row); }
+  return rows;
+}
+let SHIP_FAILTABS=[];
 async function loadShipsLive(force){
   if(SHIPS_LIVE&&!force) return SHIPS_LIVE;
-  SHIPS_LIVE=[]; SHIPS_LIVE_ERR='';
+  SHIPS_LIVE=[]; SHIPS_LIVE_ERR=''; SHIP_FAILTABS=[];
   try{
-    if(!auth.currentUser) throw new Error('로그인이 필요해요');
-    const token=await auth.currentUser.getIdToken();
-    const res=await fetch(GAS_UPLOAD_URL+'?action=ship&token='+encodeURIComponent(token));
-    const t=await res.text(); let j;
-    try{ j=JSON.parse(t); }catch(e){ throw new Error('스크립트 응답이 JSON이 아니에요 — drive_upload.gs 최신 버전으로 업데이트 후 재배포했는지 확인해 주세요'); }
-    if(j.error) throw new Error(j.error==='unauthorized'?'인증 실패 — @lowlit.co 계정으로 로그인되어 있는지 확인해 주세요':j.error);
-    await loadWeights();
-    (j.sheets||[]).forEach(sh=>{
-      const rows=sh.rows||[]; if(rows.length<2) return;
-      const head=rows[0];
-      const cd=findCol(head,['출고일','발송일','납품일','주문일','날짜','일자']);
-      const ci=findCol(head,['품목','상품명','제품명','품명','제품']);
-      const cq=findCol(head,['수량','개수']);
-      const ck=findCol(head,['원료kg','원료(kg)','원료중량','투입원료','중량(kg)','중량','kg']);
-      const cs=findCol(head,['원료구분','구분']);
-      if(cd<0) return;
-      rows.slice(1).forEach(r=>{
-        const d=parseD(r[cd]); if(!d) return;
-        const item=ci>=0?normItem(r[ci]):'';
-        const qty=cq>=0?(+String(r[cq]).replace(/[^\d.]/g,'')||0):0;
-        let kg=ck>=0?(+String(r[ck]).replace(/[^\d.]/g,'')||0):0;
-        let src=(cs>=0&&r[cs])?String(r[cs]):'';
-        const w=WEIGHTS[item];
-        if(!kg&&w&&w.g&&qty) kg=Math.round(qty*w.g)/1000; // 무게표로 자동 계산
-        if(!src) src=(w&&w.src)||'티끌 수거분';
-        SHIPS_LIVE.push({tab:sh.name,d,item,qty,kg,src,auto:!!(w&&w.g&&(ck<0||!r[ck]))});
-      });
-    });
+    await loadMeta();
+    const cfg=SHEET_CFG||DEFAULT_SHEET;
+    const id=sheetIdOf(cfg.url); if(!id) throw new Error('시트 URL을 확인해 주세요');
+    const tabs=String(cfg.tabs||'').split(',').map(s=>s.trim()).filter(Boolean);
+    if(!tabs.length) throw new Error('탭 이름을 입력해 주세요');
+    for(const tab of tabs){
+      try{
+        const res=await fetch('https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(tab));
+        if(!res.ok) throw new Error('bad');
+        const rows=parseCSV(await res.text());
+        if(rows.length<2){ SHIP_FAILTABS.push(tab); continue; }
+        const head=rows[0];
+        const cd=findCol(head,['출고일','발송일','납품일','주문일','날짜','일자']);
+        const ci=findCol(head,['품목','상품명','제품명','품명','제품']);
+        const cq=findCol(head,['수량','개수']);
+        const ck=findCol(head,['원료kg','원료(kg)','원료중량','투입원료','중량(kg)','중량','kg']);
+        const cs=findCol(head,['원료구분','구분']);
+        if(cd<0){ SHIP_FAILTABS.push(tab+' (날짜 컬럼 없음)'); continue; }
+        rows.slice(1).forEach(r=>{
+          const d=parseD(r[cd]); if(!d) return;
+          const item=ci>=0?normItem(r[ci]):'';
+          const qty=cq>=0?(+String(r[cq]).replace(/[^\d.]/g,'')||0):0;
+          let kg=ck>=0?(+String(r[ck]).replace(/[^\d.]/g,'')||0):0;
+          let src=(cs>=0&&r[cs])?String(r[cs]):'';
+          const w=WEIGHTS[item];
+          if(!kg&&w&&w.g&&qty) kg=Math.round(qty*w.g)/1000; // 무게표로 자동 계산
+          if(!src) src=(w&&w.src)||'티끌 수거분';
+          SHIPS_LIVE.push({tab,d,item,qty,kg,src,auto:!!(w&&w.g&&(ck<0||!r[ck]))});
+        });
+      }catch(e){ SHIP_FAILTABS.push(tab); }
+    }
+    if(SHIP_FAILTABS.length===tabs.length&&tabs.length) throw new Error('시트를 읽지 못했어요 — 시트 공유가 "링크가 있는 모든 사용자 · 뷰어"인지, 탭 이름('+SHIP_FAILTABS.join(', ')+')이 정확한지 확인해 주세요');
     SHIPS_LIVE.sort((a,b)=>a.d<b.d?1:-1);
-  }catch(e){ SHIPS_LIVE_ERR=/Failed to fetch/i.test(e.message)?'스크립트에 연결하지 못했어요 — Apps Script 배포의 액세스 권한이 "모든 사용자"인지, v3 코드로 "새 버전" 재배포했는지 확인해 주세요':e.message; }
+  }catch(e){ SHIPS_LIVE_ERR=/Failed to fetch/i.test(e.message||'')?'시트에 연결하지 못했어요 — 시트 공유를 "링크가 있는 모든 사용자 · 뷰어"로 설정해 주세요':(e.message||'오류'); }
   return SHIPS_LIVE;
 }
 async function drawShipLive(force){
-  $('shLiveMsg').textContent='⏳ 출고 시트에서 불러오는 중…';
+  $('shLiveMsg').textContent='⏳ 구글시트에서 불러오는 중…';
   const live=await loadShipsLive(force);
   if(SHIPS_LIVE_ERR){ $('shLiveMsg').textContent='⚠️ 시트 연동 실패: '+SHIPS_LIVE_ERR; $('shLiveSum').innerHTML=''; $('shLive').innerHTML=''; drawWeights(live); return; }
+  const t=new Date(), hm=String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0');
   const kg=live.reduce((s,x)=>s+x.kg,0), noKg=live.filter(x=>!x.kg).length;
-  $('shLiveMsg').textContent='✅ 시트에서 '+live.length+'건을 불러왔어요 (화면을 열 때마다 자동 갱신).'+(noKg?' ⚠️ 무게 미확인 '+noKg+'건 — 아래 제품 무게표에 단위 무게를 등록해 주세요.':'');
-  $('shLiveSum').innerHTML=`<span class="chip g">원료 ${fmt(kg)} kg</span> <span class="chip b">${[...new Set(live.map(x=>x.tab))].join(' · ')}</span>${noKg?` <span class="chip y">무게 미확인 ${noKg}건</span>`:''}`;
+  $('shLiveMsg').textContent='✔ '+hm+' 동기화 · '+live.length+'건'
+    +(SHIP_FAILTABS.length?' · ⚠️ 읽지 못한 탭: '+SHIP_FAILTABS.join(', '):'')
+    +(noKg?' · ⚠️ 무게 미확인 '+noKg+'건 — 아래 제품 무게표에 단위 무게를 등록해 주세요':'');
+  $('shLiveSum').innerHTML=`<span class="chip g">원료 ${fmt(kg)} kg</span> <span class="chip b">${[...new Set(live.map(x=>x.tab))].join(' · ')||'—'}</span>${noKg?` <span class="chip y">무게 미확인 ${noKg}건</span>`:''}`;
   $('shLive').innerHTML='<tr><th>탭</th><th>출고일</th><th>품목</th><th style="text-align:right">수량</th><th style="text-align:right">원료 kg</th><th>원료 구분</th></tr>'+
     live.slice(0,200).map(x=>`<tr><td class="hint">${esc(x.tab)}</td><td class="num">${esc(x.d)}</td><td>${esc(x.item)}</td><td class="num" style="text-align:right">${fmt(x.qty)}</td><td class="num" style="text-align:right">${x.kg?fmt(x.kg)+(x.auto?' <span class="hint">자동</span>':''):'<span class="chip y">무게표 필요</span>'}</td><td>${esc(x.src)}</td></tr>`).join('');
   drawWeights(live);
 }
+let AUTO_TIMER=null;
+function setAuto(on){ clearInterval(AUTO_TIMER); AUTO_TIMER=null;
+  if(on) AUTO_TIMER=setInterval(()=>{ if(!ADMIN) return; if(CURRENT==='admin/ship') drawShipLive(true); else loadShipsLive(true); },300000); }
 function drawWeights(live){
   const items=[...new Set([...(live||[]).map(x=>x.item).filter(Boolean),...Object.keys(WEIGHTS)])].sort();
   if(!items.length){ $('wtable').innerHTML='<tr><td style="color:var(--ink2)">시트 연동 후 품목이 여기에 자동으로 나타납니다</td></tr>'; return; }
@@ -1314,8 +1356,14 @@ function drawWeights(live){
   };
 }
 async function renderShip(){
+  await loadMeta();
+  const cfg=SHEET_CFG||DEFAULT_SHEET;
+  $('shUrl').value=cfg.url||''; $('shTabs').value=cfg.tabs||''; $('shAuto').checked=cfg.auto!==false;
+  $('shOpen').href=cfg.url||'#';
+  $('shSync').onclick=async()=>{ await saveSheetCfg(); drawShipLive(true); };
+  $('shAuto').onchange=async()=>{ await saveSheetCfg(); setAuto($('shAuto').checked); };
+  setAuto($('shAuto').checked);
   drawShipLive(true);
-  $('shSync').onclick=()=>drawShipLive(true);
   const ships=await loadShips(true);
   const kg=ships.reduce((s,x)=>s+(+x.kg||0),0), tik=ships.filter(x=>x.src==='티끌 수거분').reduce((s,x)=>s+(+x.kg||0),0);
   $('shSummary').innerHTML=`${ships.length}건 · 원료 ${fmt(kg)} kg (티끌 ${fmt(tik)} / 외부·혼합 ${fmt(kg-tik)})`;
