@@ -421,7 +421,6 @@
           <tr><td class="num">v1.0</td><td class="num">2021.05 ~</td><td>단일 계수 1.676 kgCO₂e/kg 적용 (초기 커뮤니케이션 기준)</td></tr>
           <tr><td class="num"><b>v2.0</b></td><td class="num">2026.07 ~</td><td>재질별 계수로 세분화 · 보수/표준 시나리오 이원화 · 대체율 0.81 도입 · 수거·운송, 공정 전력 배출 차감 · 계수 출처 공개 (Franklin Associates 2018, UK GHG CF 2024, KEITI)</td></tr>
         </table>
-        <div class="note">발행 문서 진위 확인: <a style="color:var(--green2);cursor:pointer" onclick="go('verify')">리포트 진위 확인 페이지</a> — 문서 번호로 발행 여부와 기재 값을 대조할 수 있습니다.</div>
       </div>
     </section>
 
@@ -507,16 +506,6 @@
       </div>
     </section>
 
-    <!-- ═══════════ 공개: 리포트 진위 확인 ═══════════ -->
-    <section class="screen" id="verify">
-      <div class="htitle"><h1>리포트 진위 확인</h1><span class="chip b">🌐 오픈 페이지</span></div>
-      <div class="sub">로우리트가 발행한 문서 하단의 번호로 발행 여부와 기재 값을 확인할 수 있습니다.</div>
-      <div class="card" style="max-width:520px">
-        <div class="frow"><label>리포트 번호</label>
-          <div style="display:flex;gap:8px"><input id="vSerial" placeholder="예: LWL-CE-260811-4F2"><button class="btn" id="vBtn" style="white-space:nowrap">조회</button></div></div>
-        <div id="vResult"></div>
-      </div>
-    </section>
 
     <!-- ═══════════ 캠페인 리포트 (/c/아이디) ═══════════ -->
     <section class="screen" id="campaign">
@@ -945,7 +934,6 @@ async function route(){
   if(h==='campaign-demo'){ show('campaign'); await renderCampaignPage(null,true); return; }
   if(h.startsWith('c/')){ show('campaign'); await renderCampaignPage(h.slice(2),false); return; }
   if(h==='story'){ if(!ADMIN){ show('lock'); return; } show('story'); return; }
-  if(h.startsWith('verify')){ show('verify'); initVerify(h.split('/')[1]||''); return; }
   if(h.startsWith('admin')){
     if(!ADMIN){ show('lock'); return; }
     const id=h==='admin'?'admin/dash':h;
@@ -1145,12 +1133,6 @@ async function campaignDoc(C,demo,eRows){
   const today=new Date().toISOString().slice(0,10);
   const kg=+C.total||0;
   const serial='LWL-CR-'+C.id.replace(/^C-?/,'')+'-'+today.replace(/-/g,'').slice(2);
-  const verifyUrl=BASE+'#/verify/'+serial;
-  let registered=false;
-  if(!demo){
-    try{ await setDoc(doc(db,'verify',serial),{type:'캠페인 성과 리포트 (정식 · 실측 기반)',date:today,name:C.org||'',proj:C.name||'',
-      mat:'혼합 — 로트 명세 참조',kg,cons:Math.round(kg*CO2*10)/10,std:Math.round(kg*CO2STD*10)/10,method:'v2.0',created:Date.now()}); registered=true; }catch(e){}
-  }
   const lots=C.lots||[];
   $('printArea').innerHTML=`<div style="max-width:640px;margin:0 auto">
   <div class="lc"><div class="band"></div><div class="body">
@@ -1189,23 +1171,43 @@ async function campaignDoc(C,demo,eRows){
       <tr><td></td><td style="font-weight:700">합계</td><td style="text-align:right;font-weight:700" class="num">${fmt(kg)}</td></tr>
     </table>
     <div class="hint" style="margin-bottom:12px">모든 로트는 계량 시 사진·기증확인서 일련번호로 증빙되며 원장에서 감사추적이 가능합니다.</div>
-    <h4>부록 B — 산정 방법 요약</h4>
+    <h4>부록 B — 전과정평가(LCA) 산정 정보</h4>
     <table class="lcatable">
-      <tr><td>실측 항목</td><td>수거·재자원화량(kg), 로트 명세, 참여 실적 — 저울 계량 기반 사실 기록</td></tr>
-      <tr><td>추정 항목</td><td>온실가스 감축량 — 실측 kg에 공개 배출계수를 적용한 환산값 (보수~표준 범위 병기)</td></tr>
-      <tr><td>방법론</td><td>로우리트 산정 방법론 v2.0 · ISO 14040/14044 원칙 · 대체율 0.81 · 계수: Franklin Associates 2018 (APR), UK GHG Conversion Factors 2024 (DEFRA/DESNZ), KEITI 환경성적표지</td></tr>
-      <tr><td>전체 공개</td><td>lowlit-impact.vercel.app/#/method (계수 테이블·변경 이력 포함)</td></tr>
+      <tr><td>실측 항목</td><td>수거·재자원화량(kg), 로트 명세, 참여 실적 — 저울 계량 기반 사실 기록 (사진·계량 기록 보관)</td></tr>
+      <tr><td>추정 항목</td><td>온실가스 감축량 — 실측 kg에 공개 배출계수를 적용한 환산값, 보수~표준 시나리오 범위로 병기</td></tr>
+      <tr><td>평가 방법</td><td>전과정평가(LCA) 기반 — ISO 14040:2006 / ISO 14044:2006 원칙, GHG Protocol Product Life Cycle Standard 참조 · GWP 100년 기준</td></tr>
+      <tr><td>시스템 경계</td><td>원료 생산 단계(cradle-to-gate) 비교: 신재 수지 생산 vs 포스트컨슈머 재생 수지 재생산 · 자사 수거·운송, 공정 전력 배출 차감</td></tr>
+      <tr><td>대체율 보정</td><td>재생원료의 신재 대체 품질 보정계수 0.81 적용 (과대산정 방지 가정)</td></tr>
+      <tr><td>제품화 수율</td><td>배치 실측 수율 적용 (방법론 v2.0 · 현재 83%)</td></tr>
     </table>
-    <h4>진위 확인</h4>
-    <div class="stamp" style="margin-top:10px">
-      <div style="display:flex;gap:12px;align-items:center">
-        <div id="vqr"></div>
-        <div class="hint" style="max-width:220px">문서 진위 확인<br><span class="num" style="font-size:9.5px">${verifyUrl}</span>${demo?'':(registered?'':'<br>⚠️ 오프라인 발행 — 온라인 검증 미등록')}</div>
-      </div>
+    <h4>부록 C — 적용 배출계수 (kgCO₂e/kg)</h4>
+    <table class="lcatable">
+      <tr><th>재질</th><th>신재</th><th>재생</th><th>순차이</th><th>출처</th></tr>
+      <tr><td style="font-weight:400;color:inherit">PE/LDPE</td><td>2.96</td><td>1.09</td><td>1.87</td><td>참고문헌 2</td></tr>
+      <tr><td style="font-weight:400;color:inherit">PP</td><td>1.84</td><td>0.53</td><td>1.31</td><td>참고문헌 1</td></tr>
+      <tr><td style="font-weight:400;color:inherit">HDPE</td><td>1.89</td><td>0.56</td><td>1.33</td><td>참고문헌 1</td></tr>
+      <tr><td style="font-weight:400;color:inherit">보수 시나리오</td><td colspan="3">순차이 ≈0.9 일괄 적용</td><td>참고문헌 3</td></tr>
+    </table>
+    <h4>부록 D — 참고문헌</h4>
+    <ol class="refs">
+      <li>Franklin Associates (2018). <i>Life Cycle Impacts for Postconsumer Recycled Resins: PET, HDPE, and PP.</i> The Association of Plastic Recyclers (APR).</li>
+      <li>UK DESNZ/DEFRA (2024). <i>UK Government GHG Conversion Factors for Company Reporting</i> — Material use.</li>
+      <li>환경부·한국환경산업기술원(KEITI). 환경성적표지 배출계수 데이터베이스.</li>
+      <li>ISO 14040:2006, ISO 14044:2006. <i>Environmental management — Life cycle assessment.</i></li>
+      <li>WRI/WBCSD (2011). <i>GHG Protocol Product Life Cycle Accounting and Reporting Standard.</i></li>
+    </ol>
+    <h4>부록 E — 증빙·품질 관리</h4>
+    <table class="lcatable">
+      <tr><td>계량 증빙</td><td>전 로트 저울 실측 · 계량 사진 및 일시 기록 보관 (요청 시 열람 제공)</td></tr>
+      <tr><td>문서 연계</td><td>로트별 기증확인서 일련번호 발급 · 발급 대장 기록</td></tr>
+      <tr><td>이중 청구 검사</td><td>본 실적은 타 캠페인·EPR 실적·플라스틱 크레딧에 중복 계상되지 않았음을 확인 (발행 전 자동 검사)</td></tr>
+      <tr><td>감사 추적</td><td>수거 로트 → 배치 → 제품으로 이어지는 원장 기록으로 전 과정 추적 가능</td></tr>
+      <tr><td>방법론 공개</td><td>lowlit-impact.vercel.app/#/method — 계수 테이블·변경 이력 전체 공개</td></tr>
+    </table>
+    <div class="stamp"><div></div>
       <div style="text-align:right">${today.replace(/-/g,'. ')}.<br><b>로우리트콜렉티브 주식회사</b></div></div>
     <div class="foot2">온실가스 감축량은 제3자 검증을 거친 인증 수치가 아닌 공개 계수 기반 환산값이며, 공시 인용 시 산정 기준 각주를 함께 기재할 것을 권장합니다. 문의 business@lowlit.co</div>
   </div></div></div>`;
-  try{ if(window.QRCode) new QRCode(document.getElementById('vqr'),{text:verifyUrl,width:72,height:72,correctLevel:QRCode.CorrectLevel.M}); }catch(e){}
   document.body.classList.add('pdoc');
   window.print();
 }
@@ -1882,15 +1884,6 @@ $('calcRptBtn').onclick=async()=>{
   const today=new Date().toISOString().slice(0,10);
   const serial='LWL-CE-'+today.replace(/-/g,'').slice(2)+'-'+Date.now().toString(36).slice(-4).toUpperCase();
   const name=$('cName').value.trim(), proj=$('cProj').value.trim();
-  const verifyUrl=BASE+'#/verify/'+serial;
-  // 온라인 검증 등록 (실패해도 발행은 진행)
-  let registered=false;
-  try{
-    await setDoc(doc(db,'verify',serial),{type:'탄소 감축 사전 추정서 (참고용)',date:today,name,proj,
-      preset:c.preset,qty:c.qty,unitG:c.unitG,mat:c.matName,kg:c.kg,
-      std:Math.round(c.std*10)/10,cons:Math.round(c.cons*10)/10,method:'v2.0',created:Date.now()});
-    registered=true;
-  }catch(e){}
   const w1=100, w2=Math.max(Math.round(c.recycled/Math.max(c.virgin,0.001)*100),3);
   const efSrc = c.matKey==='pe'
     ? 'UK Government GHG Conversion Factors 2024 (DEFRA/DESNZ, Material use)'
@@ -1924,11 +1917,7 @@ $('calcRptBtn').onclick=async()=>{
       <div style="height:14px;border-radius:6px;background:linear-gradient(90deg,#6fcf97,#2c5743);width:${w2}%"></div>
     </div>
     <div class="quote">감축량은 단일값이 아닌 <b>계수 시나리오에 따른 범위(−${fmt(c.cons)} ~ −${fmt(c.std)} kgCO₂e)</b>로 제시하며, 대표값은 낮은 쪽(보수)을 사용합니다. 상세 방법론·계수·참고문헌은 2면 부록 참조.</div>
-    <div class="stamp">
-      <div style="display:flex;gap:12px;align-items:center">
-        <div id="vqr"></div>
-        <div class="hint" style="max-width:200px">문서 진위 확인<br><span class="num" style="font-size:9.5px">${verifyUrl}</span>${registered?'':'<br>⚠️ 오프라인 발행 — 온라인 검증 미등록'}</div>
-      </div>
+    <div class="stamp"><div></div>
       <div style="text-align:right">${today.replace(/-/g,'. ')}.<br><b>로우리트콜렉티브 주식회사</b></div></div>
     <div class="foot2">본 리포트는 원료 전환 효과의 사전 추정값입니다. 실제 제작 후에는 계량 로트 기반의 실측 리포트(납품 명세·기증확인서 연계)를 발행합니다. 문의 business@lowlit.co</div>
   </div></div>
@@ -1960,42 +1949,13 @@ $('calcRptBtn').onclick=async()=>{
       <li>ISO 14040:2006, ISO 14044:2006. <i>Environmental management — Life cycle assessment.</i></li>
       <li>WRI/WBCSD (2011). <i>GHG Protocol Product Life Cycle Accounting and Reporting Standard.</i></li>
     </ol>
-    <h4>진위 확인</h4>
-    <div class="hint">본 문서는 발행 시점에 로우리트 임팩트 원장에 기록되며, ${verifyUrl} 에서 리포트 번호로 발행 여부와 기재 값을 대조할 수 있습니다. 전체 방법론·계수 변경 이력: lowlit-impact.vercel.app/#/method</div>
+    <div class="hint">전체 방법론·계수 테이블·변경 이력 공개: lowlit-impact.vercel.app/#/method</div>
     <div class="foot2" style="margin-top:14px">본 추정값은 제3자 검증을 거친 인증 수치가 아니며, 원자재 산지·공정 조건에 따라 실제 값과 차이가 있을 수 있습니다. 계수 갱신 시 기발행 문서는 소급 재계산하지 않고 방법론 버전을 병기합니다.</div>
   </div></div></div>`;
-  try{ if(window.QRCode) new QRCode(document.getElementById('vqr'),{text:verifyUrl,width:72,height:72,correctLevel:QRCode.CorrectLevel.M}); }catch(e){}
   document.body.classList.add('pdoc');
   window.print();
 };
 syncKg();
-
-/* ─────────── 공개: 리포트 진위 확인 ─────────── */
-async function initVerify(serial){
-  if(serial){ $('vSerial').value=decodeURIComponent(serial); lookupVerify(); }
-  $('vBtn').onclick=lookupVerify;
-}
-async function lookupVerify(){
-  const s=$('vSerial').value.trim().toUpperCase();
-  if(!s){ $('vResult').innerHTML=''; return; }
-  $('vResult').innerHTML='<div class="hint" style="margin-top:10px">조회 중…</div>';
-  try{
-    const snap=await getDoc(doc(db,'verify',s));
-    if(!snap.exists()){ $('vResult').innerHTML='<div class="note" style="margin-top:10px">❌ 해당 번호로 발행된 기록이 없습니다. 번호를 다시 확인하시거나 business@lowlit.co 로 문의해 주세요.</div>'; return; }
-    const v=snap.data();
-    $('vResult').innerHTML=`<div class="note" style="margin-top:10px;background:#e2f2e7;color:var(--green2)">✅ 로우리트가 발행한 문서입니다</div>
-      <table style="margin-top:10px">
-        <tr><td style="font-weight:700;color:var(--ink2);width:110px">문서 유형</td><td>${esc(v.type||'')}</td></tr>
-        <tr><td style="font-weight:700;color:var(--ink2)">발행일</td><td class="num">${esc(v.date||'')}</td></tr>
-        ${v.name?`<tr><td style="font-weight:700;color:var(--ink2)">수신</td><td>${esc(v.name)}</td></tr>`:''}
-        <tr><td style="font-weight:700;color:var(--ink2)">적용 재질</td><td>${esc(v.mat||'')}</td></tr>
-        <tr><td style="font-weight:700;color:var(--ink2)">재생 원료</td><td class="num">${fmt(v.kg)} kg</td></tr>
-        <tr><td style="font-weight:700;color:var(--ink2)">감축량 범위</td><td class="num">−${fmt(v.cons)} ~ −${fmt(v.std)} kgCO₂e</td></tr>
-        <tr><td style="font-weight:700;color:var(--ink2)">방법론</td><td>${esc(v.method||'')} · <a style="color:var(--green2)" onclick="go('method')">방법론 보기</a></td></tr>
-      </table>
-      <div class="hint" style="margin-top:8px">문서에 기재된 값과 위 값이 다르면 위·변조를 의심할 수 있습니다.</div>`;
-  }catch(e){ $('vResult').innerHTML='<div class="note" style="margin-top:10px">조회 실패: '+(e.code||e.message)+'</div>'; }
-}
 
 /* ─────────── 시작 ─────────── */
 calc(); renderHero(); route();
