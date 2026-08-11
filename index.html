@@ -117,7 +117,8 @@
   .cmp .bl{height:16px;border-radius:6px;background:#c9c4b4;min-width:4px;transition:width .3s}
   .cmp .bl.g{background:linear-gradient(90deg,var(--mint),var(--green2))}
   .big{font-size:26px;font-weight:800;color:var(--green2);letter-spacing:-.02em}
-  .calcrow{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+  .calcrow{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+  .calcrow label{white-space:nowrap;min-height:16px}
   .calcrow .frow{margin-bottom:0;flex:1;min-width:130px}
   /* 모달 */
   .modalbg{display:none;position:fixed;inset:0;background:rgba(22,38,31,.5);z-index:50;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
@@ -126,7 +127,7 @@
   .modal h3{font-size:15px;margin-bottom:14px}
   /* 로우리트 문서 (기술 문서 톤) */
   .lc{max-width:640px;margin:0 auto 16px;background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden}
-  .lc .band{height:4px;background:linear-gradient(90deg,var(--lime),var(--mint),var(--green2))}
+  .lc .band{height:7px;background:linear-gradient(90deg,var(--lime),var(--mint),var(--green2));-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .lc .body{padding:34px 40px 26px}
   .lc h2{font-family:'Noto Serif KR',serif;font-weight:900;letter-spacing:.16em;color:var(--ink)}
   .lc .heroNum .n{font-family:'Noto Serif KR',serif;color:var(--ink)}
@@ -139,7 +140,7 @@
   .lc .refs{font-size:10.5px;color:var(--ink2);line-height:1.8;margin:0 0 12px;padding-left:18px}
   .lc{position:relative}
   .lc .wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:0}
-  .lc .wm span{transform:rotate(-22deg);font-size:42px;font-weight:900;letter-spacing:.18em;color:rgba(74,92,83,.08);white-space:nowrap;font-family:'Noto Serif KR',serif}
+  .lc .wm span{transform:rotate(-20deg);font-size:26px;font-weight:800;letter-spacing:.5em;color:rgba(29,58,47,.06);white-space:nowrap;font-family:inherit;border:2px solid rgba(29,58,47,.05);border-radius:8px;padding:10px 22px}
   .lc .body{position:relative;z-index:1}
   .pagebreak{page-break-before:always;break-before:page}
   @media screen{.pagebreak{height:14px}}
@@ -147,7 +148,8 @@
   .lc .brand b{color:var(--green)}
   .lc h2{font-size:21px;letter-spacing:.42em;text-align:center;color:var(--green);margin:20px 0 2px;font-weight:800}
   .lc .en{text-align:center;font-size:10px;color:#8b8676;letter-spacing:.2em;margin-bottom:18px}
-  .lc .heroNum{text-align:center;margin:14px 0 2px}
+  .lc .heroPanel{background:#f1f5ec;border-radius:12px;padding:18px 16px 14px;margin:14px 0 16px}
+  .lc .heroNum{text-align:center;margin:0 0 2px}
   .lc .heroNum .n{font-size:46px;font-weight:800;letter-spacing:-.03em;color:var(--green)}
   .lc .heroNum .u{font-size:16px;font-weight:700;color:var(--ink2)}
   .lc .heroLab{text-align:center;font-size:11px;color:var(--ink2);font-weight:700;margin-bottom:14px}
@@ -164,6 +166,7 @@
   /* 인쇄 */
   #printArea{display:none}
   @media print{
+    *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
     body{background:#fff}
     .modalbg{display:none!important}
     /* 문서(확인서·인증서) 인쇄: printArea만 */
@@ -485,12 +488,12 @@
             </select></div>
           <div class="frow"><label>재생 원료 투입량 (kg)</label><input type="number" id="ckg" value="100" min="0.1" step="0.1">
             <div class="hint" id="ckgHint">수량 × 개당 무게 × 함량으로 자동 계산</div></div>
-          <div class="frow" style="flex:0"><button class="btn" id="calcBtn">계산</button></div>
+          <div class="frow" style="flex:0"><label>&nbsp;</label><button class="btn" id="calcBtn">계산</button></div>
         </div>
         <div class="calcrow" style="margin-bottom:14px">
           <div class="frow"><label>업체·브랜드명 (리포트용, 선택)</label><input id="cName" placeholder="예: ○○전자"></div>
           <div class="frow"><label>제품·프로젝트 (선택)</label><input id="cProj" placeholder="예: 라운지 스툴 20개 제작"></div>
-          <div class="frow" style="flex:0"><button class="btn o" id="calcRptBtn">📄 리포트 발행 (PDF)</button></div>
+          <div class="frow" style="flex:0"><label>&nbsp;</label><button class="btn o" id="calcRptBtn">📄 사전 추정서 발행 (PDF)</button></div>
         </div>
         <div class="cmp">
           <div class="row"><span class="rl">신재로 만들 때</span><div class="bl" id="cb1" style="width:72%"></div><span class="num" id="cv1"></span></div>
@@ -521,7 +524,7 @@
       <div class="sub" id="cpSub"></div>
       <div class="card" style="margin-bottom:14px">
         <div class="ctitle">리포트 정보
-          <span style="display:flex;gap:6px"><button class="btn s" onclick="window.print()">인쇄 / PDF 저장</button><button class="btn s o" id="cpCsvBtn">데이터 CSV</button></span>
+          <span style="display:flex;gap:6px"><button class="btn s" id="cpPdfBtn">📄 리포트 다운로드 (PDF)</button><button class="btn s o" id="cpCsvBtn">데이터 CSV</button></span>
         </div>
         <table>
           <tr>
@@ -1135,6 +1138,76 @@ async function renderCampaignPage(cid,demo){
 ※ 산정 기준: 로우리트 임팩트 원장 산정 방법론 v2.0 (신재 원료 대비 회피배출량 · 계수 출처 공개) · 실측 계량 로트 · 타 실적 중복 계상 없음 (리포트 No. LWL-CR-${C.id.replace(/^C-?/,'')}-001)`;
   $('cpCsvBtn').onclick=()=>downloadCSV(C.id+'_성과데이터.csv',
     [['구분','지표','값','단위','산정 기준'],...eRows,[],['로트 명세'],['일자','재질','kg'],...lots.map(l=>[l.d,l.mat,l.kg])]);
+  $('cpPdfBtn').onclick=()=>campaignDoc(C,demo,eRows);
+}
+/* 캠페인 정식 리포트 PDF (2면) */
+async function campaignDoc(C,demo,eRows){
+  const today=new Date().toISOString().slice(0,10);
+  const kg=+C.total||0;
+  const serial='LWL-CR-'+C.id.replace(/^C-?/,'')+'-'+today.replace(/-/g,'').slice(2);
+  const verifyUrl=BASE+'#/verify/'+serial;
+  let registered=false;
+  if(!demo){
+    try{ await setDoc(doc(db,'verify',serial),{type:'캠페인 성과 리포트 (정식 · 실측 기반)',date:today,name:C.org||'',proj:C.name||'',
+      mat:'혼합 — 로트 명세 참조',kg,cons:Math.round(kg*CO2*10)/10,std:Math.round(kg*CO2STD*10)/10,method:'v2.0',created:Date.now()}); registered=true; }catch(e){}
+  }
+  const lots=C.lots||[];
+  $('printArea').innerHTML=`<div style="max-width:640px;margin:0 auto">
+  <div class="lc"><div class="band"></div><div class="body">
+    <div class="brand"><span><b>LOWLIT</b> COLLECTIVE · IMPACT REPORT</span><span class="serial2">No. ${serial} · 1/2</span></div>
+    <h2>캠페인 성과 리포트</h2><div class="en">OFFICIAL CAMPAIGN IMPACT REPORT · MEASURED</div>
+    ${demo?'<div style="background:#fdf1d7;color:#8a6410;font-size:11px;font-weight:700;border-radius:6px;padding:7px 10px;text-align:center;margin-bottom:14px">예시 화면 — 수치는 데모 데이터입니다</div>'
+      :'<div style="background:#e2f2e7;color:#2c5743;font-size:11px;font-weight:700;border-radius:6px;padding:7px 10px;text-align:center;margin-bottom:14px">본 리포트의 수거·재자원화량은 계량 실측 로트(증빙 보관)에 기반한 정식 발행본입니다</div>'}
+    <dl style="border-top:none;padding-top:0;margin-bottom:6px">
+      ${C.org?`<dt>발주 기업</dt><dd><b>${esc(C.org)}</b></dd>`:''}
+      <dt>캠페인</dt><dd>${esc((C.name||'').replace(' (예시)',''))} (${esc(C.id)})</dd>
+      ${C.period?`<dt>기간</dt><dd>${esc(C.period)}</dd>`:''}
+      ${C.sites?`<dt>사업장</dt><dd>${C.sites}개 사업장${C.participants?' · 참여 임직원 '+fmt(C.participants)+'명':''}</dd>`:''}
+      <dt>발행일</dt><dd class="num">${today}</dd>
+    </dl>
+    <div class="heroPanel"><div class="heroNum"><span class="n">${fmt(kg)}</span> <span class="u">kg</span></div>
+    <div class="heroLab">폐플라스틱 수거·재자원화량 — 계량 실측 합계</div></div>
+    <div class="impacts">
+      <div><div class="iv">−${(kg*CO2/1000).toFixed(3)} ~ −${(kg*CO2STD/1000).toFixed(3)}</div><div class="il">온실가스 감축량 tCO₂eq (보수~표준)</div></div>
+      <div><div class="iv">약 ${fmt(Math.round(kg*CAPS))}개</div><div class="il">병뚜껑 환산 (kg×400)</div></div>
+      ${C.goods?`<div><div class="iv">${fmt(C.goods)}개</div><div class="il">${esc(C.goodsName||'업사이클링 제품')} 생산</div></div>`:''}
+    </div>
+    <h4>환경(E) 정량 성과 지표</h4>
+    <table class="lcatable">
+      <tr><th>구분</th><th>지표</th><th style="text-align:right">값</th><th>단위</th></tr>
+      ${eRows.map(r=>`<tr><td>${r[0]}</td><td style="font-weight:400;color:inherit">${r[1]}</td><td style="text-align:right;font-weight:700">${r[2]}</td><td style="font-weight:400;color:inherit">${r[3]}</td></tr>`).join('')}
+    </table>
+    <div class="foot2">각 지표의 산정 기준·계수 출처는 2면 부록 참조 · 본 실적은 타 캠페인·EPR·플라스틱 크레딧에 중복 계상되지 않았습니다.</div>
+  </div></div>
+  <div class="pagebreak"></div>
+  <div class="lc"><div class="band"></div><div class="body">
+    <div class="brand"><span><b>LOWLIT</b> COLLECTIVE · APPENDIX</span><span class="serial2">No. ${serial} · 2/2</span></div>
+    <h4>부록 A — 수거 로트 명세 (계량 실측)</h4>
+    <table class="lcatable">
+      <tr><th>일자</th><th>재질</th><th style="text-align:right">kg</th></tr>
+      ${lots.map(l=>`<tr><td style="font-weight:400;color:inherit" class="num">${esc(l.d)}</td><td style="font-weight:400;color:inherit">${esc(l.mat)}</td><td style="text-align:right" class="num">${fmt(l.kg)}</td></tr>`).join('')||'<tr><td colspan="3">—</td></tr>'}
+      <tr><td></td><td style="font-weight:700">합계</td><td style="text-align:right;font-weight:700" class="num">${fmt(kg)}</td></tr>
+    </table>
+    <div class="hint" style="margin-bottom:12px">모든 로트는 계량 시 사진·기증확인서 일련번호로 증빙되며 원장에서 감사추적이 가능합니다.</div>
+    <h4>부록 B — 산정 방법 요약</h4>
+    <table class="lcatable">
+      <tr><td>실측 항목</td><td>수거·재자원화량(kg), 로트 명세, 참여 실적 — 저울 계량 기반 사실 기록</td></tr>
+      <tr><td>추정 항목</td><td>온실가스 감축량 — 실측 kg에 공개 배출계수를 적용한 환산값 (보수~표준 범위 병기)</td></tr>
+      <tr><td>방법론</td><td>로우리트 산정 방법론 v2.0 · ISO 14040/14044 원칙 · 대체율 0.81 · 계수: Franklin Associates 2018 (APR), UK GHG Conversion Factors 2024 (DEFRA/DESNZ), KEITI 환경성적표지</td></tr>
+      <tr><td>전체 공개</td><td>lowlit-impact.vercel.app/#/method (계수 테이블·변경 이력 포함)</td></tr>
+    </table>
+    <h4>진위 확인</h4>
+    <div class="stamp" style="margin-top:10px">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div id="vqr"></div>
+        <div class="hint" style="max-width:220px">문서 진위 확인<br><span class="num" style="font-size:9.5px">${verifyUrl}</span>${demo?'':(registered?'':'<br>⚠️ 오프라인 발행 — 온라인 검증 미등록')}</div>
+      </div>
+      <div style="text-align:right">${today.replace(/-/g,'. ')}.<br><b>로우리트콜렉티브 주식회사</b></div></div>
+    <div class="foot2">온실가스 감축량은 제3자 검증을 거친 인증 수치가 아닌 공개 계수 기반 환산값이며, 공시 인용 시 산정 기준 각주를 함께 기재할 것을 권장합니다. 문의 business@lowlit.co</div>
+  </div></div></div>`;
+  try{ if(window.QRCode) new QRCode(document.getElementById('vqr'),{text:verifyUrl,width:72,height:72,correctLevel:QRCode.CorrectLevel.M}); }catch(e){}
+  document.body.classList.add('pdoc');
+  window.print();
 }
 
 /* ─────────── 관리자: 대시보드 ─────────── */
@@ -1836,8 +1909,8 @@ $('calcRptBtn').onclick=async()=>{
       <dt>재생 원료 투입량</dt><dd class="num">${fmt(c.kg)} kg</dd>
       <dt>발행일</dt><dd class="num">${today}</dd>
     </dl>
-    <div class="heroNum"><span class="n">−${fmt(c.cons)}</span> <span class="u">kgCO₂e</span></div>
-    <div class="heroLab">신재 대비 온실가스 감축량 — 보수 시나리오 기준 최소값 (GWP 100년)</div>
+    <div class="heroPanel"><div class="heroNum"><span class="n">−${fmt(c.cons)}</span> <span class="u">kgCO₂e</span></div>
+    <div class="heroLab">신재 대비 온실가스 감축량 — 보수 시나리오 기준 최소값 (GWP 100년)</div></div>
     <div class="impacts">
       <div><div class="iv">−${fmt(c.cons)} ~ −${fmt(c.std)}</div><div class="il">산정 범위 (보수~표준 시나리오)</div></div>
       <div><div class="iv">약 ${fmt(c.cons/6.6)}그루</div><div class="il">소나무 연간 흡수 환산 (보수)</div></div>
