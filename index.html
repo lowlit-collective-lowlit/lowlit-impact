@@ -121,18 +121,13 @@
   .modalbg.show{display:flex}
   .modal{background:#fff;border-radius:14px;padding:22px;width:100%;max-width:460px}
   .modal h3{font-size:15px;margin-bottom:14px}
-  /* 로우리트 인증서 (티끌 테라조) */
-  .lc{max-width:640px;margin:0 auto;background:#fffdf8;border:1.5px solid var(--green);border-radius:2px;overflow:hidden}
-  .lc .band{height:8px;background:linear-gradient(90deg,var(--lime),var(--mint),var(--green2))}
-  .lc .terra{height:22px;background-color:#f4f2ea;background-image:
-    radial-gradient(circle 3.2px at 12px 11px,#2c5743 97%,transparent),
-    radial-gradient(circle 2.4px at 34px 6px,#6fcf97 97%,transparent),
-    radial-gradient(circle 3.8px at 55px 14px,#d7e96b 97%,transparent),
-    radial-gradient(circle 2.2px at 76px 8px,#1d3a2f 97%,transparent),
-    radial-gradient(circle 3px at 95px 15px,#e8b64c 97%,transparent),
-    radial-gradient(circle 2.6px at 112px 7px,#6fcf97 97%,transparent);
-    background-size:128px 22px;background-repeat:repeat-x}
-  .lc .body{padding:30px 38px 24px}
+  /* 로우리트 문서 (클린) */
+  .lc{max-width:640px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .lc .band{height:5px;background:linear-gradient(90deg,var(--lime),var(--mint),var(--green2))}
+  .lc .body{padding:34px 40px 26px}
+  .lc .lcatable{width:100%;border-collapse:collapse;font-size:11.5px;margin-bottom:14px}
+  .lc .lcatable td{padding:6px 8px;border-bottom:1px solid #f0eee6;vertical-align:top}
+  .lc .lcatable td:first-child{width:96px;font-weight:700;color:var(--ink2);white-space:nowrap}
   .lc .brand{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;letter-spacing:.14em;color:var(--ink2);font-weight:700}
   .lc .brand b{color:var(--green)}
   .lc h2{font-size:21px;letter-spacing:.42em;text-align:center;color:var(--green);margin:20px 0 2px;font-weight:800}
@@ -372,6 +367,16 @@
       <div class="htitle"><h1>산정 방법론 v2.0</h1><span class="chip g">공개 문서</span></div>
       <div class="sub">로우리트가 사용하는 계수·산식·한계를 공개합니다. 공개 페이지의 "탄소 감축 기여량"은 아래 산식으로 계산됩니다.</div>
       <div class="card" style="margin-bottom:14px">
+        <div class="ctitle">전과정평가(LCA) 기반 산정 원칙</div>
+        <table>
+          <tr><td style="width:110px;font-weight:700;color:var(--ink2)">평가 방법</td><td>ISO 14040/14044 원칙에 따른 전과정평가(LCA) 기반 · GHG Protocol Product Standard 참조 · GWP 100년 기준</td></tr>
+          <tr><td style="font-weight:700;color:var(--ink2)">시스템 경계</td><td>원료 생산 단계(cradle-to-gate) 비교: 신재 수지 생산 vs 포스트컨슈머 재생 수지 재생산 — 여기에 자사 수거·운송 배출과 공정 전력 배출을 차감(보수적 처리)</td></tr>
+          <tr><td style="font-weight:700;color:var(--ink2)">기능 단위</td><td>수지 원료 1kg (제품 단위 환산 시 배치 실측 수율 적용)</td></tr>
+          <tr><td style="font-weight:700;color:var(--ink2)">제외 항목</td><td>제품 사용·폐기 단계 (양 시나리오 동일 조건 가정) · PLA는 산정 제외</td></tr>
+          <tr><td style="font-weight:700;color:var(--ink2)">한계</td><td>본 수치는 공개 계수 기반 추정값으로 제3자 검증 인증 수치가 아니며, 계수 갱신 시 소급 재계산하지 않고 버전을 병기합니다</td></tr>
+        </table>
+      </div>
+      <div class="card" style="margin-bottom:14px">
         <div class="ctitle">탄소 감축 기여량(회피배출량) 산식 — 버진 원료 제품 대비</div>
         <div class="formula">탄소 감축 기여량 = Σ재질 [ 제품화kg × (EF_virgin − EF_recycled) × 대체율 0.81 ]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;− 수거·운송 배출 − 자사 공정 전력 배출<br><br>
@@ -383,9 +388,9 @@
         <table class="method">
           <tr><th>재질</th><th style="text-align:right">EF 버진</th><th style="text-align:right">EF 재생</th><th style="text-align:right">순차이</th><th>출처</th><th>시나리오</th></tr>
           <tr><td>PP</td><td class="num" style="text-align:right">1.47</td><td class="num" style="text-align:right">실측 예정</td><td class="num" style="text-align:right">≈0.9</td><td>환경성적표지(KEITI)</td><td><span class="chip g">보수</span></td></tr>
-          <tr><td>PP</td><td class="num" style="text-align:right">1.84</td><td class="num" style="text-align:right">0.53</td><td class="num" style="text-align:right">1.31</td><td>APR/Franklin 2018</td><td><span class="chip b">표준</span></td></tr>
-          <tr><td>HDPE</td><td class="num" style="text-align:right">1.89</td><td class="num" style="text-align:right">0.56</td><td class="num" style="text-align:right">1.33</td><td>APR/Franklin 2018</td><td><span class="chip b">표준</span></td></tr>
-          <tr><td>PE/LDPE</td><td class="num" style="text-align:right">2.96</td><td class="num" style="text-align:right">1.09</td><td class="num" style="text-align:right">1.87</td><td>UK DEFRA 2024</td><td><span class="chip b">표준</span></td></tr>
+          <tr><td>PP</td><td class="num" style="text-align:right">1.84</td><td class="num" style="text-align:right">0.53</td><td class="num" style="text-align:right">1.31</td><td>Franklin Associates 2018, <i>Life Cycle Impacts for Postconsumer Recycled Resins</i> (APR)</td><td><span class="chip b">표준</span></td></tr>
+          <tr><td>HDPE</td><td class="num" style="text-align:right">1.89</td><td class="num" style="text-align:right">0.56</td><td class="num" style="text-align:right">1.33</td><td>Franklin Associates 2018 (APR) 동일</td><td><span class="chip b">표준</span></td></tr>
+          <tr><td>PE/LDPE</td><td class="num" style="text-align:right">2.96</td><td class="num" style="text-align:right">1.09</td><td class="num" style="text-align:right">1.87</td><td>UK Government GHG Conversion Factors 2024 (DEFRA/DESNZ)</td><td><span class="chip b">표준</span></td></tr>
           <tr><td>PLA</td><td colspan="3" style="text-align:center;color:var(--ink2)">산정 제외 (kg만 집계)</td><td>—</td><td><span class="chip y">별도</span></td></tr>
           <tr><td>전력</td><td colspan="3" class="num" style="text-align:center">0.459 kgCO₂e/kWh</td><td>국가 전력 배출계수</td><td>매년 갱신</td></tr>
           <tr><td>병뚜껑 환산</td><td colspan="3" class="num" style="text-align:center">400개/kg (개당 2.5g)</td><td>자사 실측</td><td>커뮤니케이션용</td></tr>
@@ -431,7 +436,7 @@
       </div>
       <div class="card">
         <div class="ctitle">탄소 감축 계산기 <span class="more">신재 → 재생 전환 시 · 방법론 v2.0 계수</span></div>
-        <div class="calcrow" style="margin-bottom:14px">
+        <div class="calcrow" style="margin-bottom:10px">
           <div class="frow"><label>재질</label>
             <select id="cm">
               <option value="pe" selected>PE / LDPE</option>
@@ -440,6 +445,11 @@
             </select></div>
           <div class="frow"><label>재생 원료 사용량 (kg)</label><input type="number" id="ckg" value="100" min="1"></div>
           <div class="frow" style="flex:0"><button class="btn" id="calcBtn">계산</button></div>
+        </div>
+        <div class="calcrow" style="margin-bottom:14px">
+          <div class="frow"><label>업체·브랜드명 (리포트용, 선택)</label><input id="cName" placeholder="예: ○○전자"></div>
+          <div class="frow"><label>제품·프로젝트 (선택)</label><input id="cProj" placeholder="예: 라운지 스툴 20개 제작"></div>
+          <div class="frow" style="flex:0"><button class="btn o" id="calcRptBtn">📄 리포트로 보기 (PDF)</button></div>
         </div>
         <div class="cmp">
           <div class="row"><span class="rl">신재로 만들 때</span><div class="bl" id="cb1" style="width:72%"></div><span class="num" id="cv1"></span></div>
@@ -1511,7 +1521,7 @@ async function renderDocs(){
     const l=lots.find(x=>x.id===$('dcLot').value); if(!l) return;
     const serial='LWL-DC-'+l.d.replace(/-/g,'').slice(2)+'-'+l.id.slice(0,4).toUpperCase();
     const today=new Date().toISOString().slice(0,10).replace(/-/g,'. ');
-    printDoc(`<div class="lc"><div class="band"></div><div class="terra"></div><div class="body">
+    printDoc(`<div class="lc"><div class="band"></div><div class="body">
       <div class="brand"><span><b>LOWLIT</b> COLLECTIVE · IMPACT LEDGER</span><span class="serial2">No. ${serial}</span></div>
       <h2>기증확인서</h2><div class="en">CERTIFICATE OF DONATION</div>
       <div class="heroNum"><span class="n">${fmt(l.kg)}</span> <span class="u">kg</span></div>
@@ -1528,10 +1538,9 @@ async function renderDocs(){
       </dl>
       <div class="quote">위 티끌 플라스틱이 로우리트콜렉티브에 기증되어 자원순환 공정에 투입되었음을 확인합니다. 이 플라스틱은 새 제품으로 다시 태어나 500년의 순환 여정을 시작합니다.</div>
       <div class="stamp"><div></div>
-      <div style="text-align:right">${today}.<br><b>로우리트콜렉티브 주식회사</b></div>
-      <div class="seal">LOWLIT<br>COLLECTIVE</div></div>
-      <div class="foot2">탄소 감축 기여량은 신재 원료 제품 대비 회피배출량으로, 로우리트 산정 방법론 v2.0(계수 출처 공개)에 따라 보수 기준으로 계산되었습니다. 본 확인서는 발급 대장에 기록되며 일련번호로 진위를 확인할 수 있습니다.</div>
-    </div><div class="terra"></div><div class="band"></div></div>`);
+      <div style="text-align:right">${today}.<br><b>로우리트콜렉티브 주식회사</b></div></div>
+      <div class="foot2">탄소 감축 기여량은 신재 원료 제품 대비 회피배출량으로, 전과정평가(LCA) 기반의 로우리트 산정 방법론 v2.0(ISO 14040/14044 원칙 · 계수 출처 공개)에 따라 보수 기준으로 계산되었습니다. 본 확인서는 발급 대장에 기록되며 일련번호로 진위를 확인할 수 있습니다.</div>
+    </div></div>`);
   };
   $('mcMake').onclick=()=>{
     const p=PARTNERS.find(x=>x.id===$('mcPartner').value); if(!p) return;
@@ -1544,7 +1553,7 @@ function makeMonthlyCert(p,ym,annual){
   const label=annual? y+'년 연간' : y+'년 '+(+ym.slice(5,7))+'월';
   const serial='LWL-PC-'+ym.replace('-','')+'-'+((p.id||p.name||'').toString().slice(0,4).toUpperCase());
   const today=new Date().toISOString().slice(0,10).replace(/-/g,'. ');
-  printDoc(`<div class="lc"><div class="band"></div><div class="terra"></div><div class="body">
+  printDoc(`<div class="lc"><div class="band"></div><div class="body">
     <div class="brand"><span><b>LOWLIT</b> COLLECTIVE · IMPACT LEDGER</span><span class="serial2">No. ${serial}</span></div>
     <h2>${annual?'연간 임팩트 인증서':'월간 임팩트 인증서'}</h2><div class="en">PARTNER IMPACT CERTIFICATE</div>
     <div class="heroNum"><span class="n">${fmt(kg)}</span> <span class="u">kg</span></div>
@@ -1556,10 +1565,9 @@ function makeMonthlyCert(p,ym,annual){
     </div>
     <div class="quote">위 파트너가 기간 내 티끌 플라스틱을 기증하여 자원순환과 탄소 감축에 기여하였음을 인증합니다. 기증된 플라스틱은 로우리트의 순환 공정을 거쳐 새 제품으로 다시 태어납니다.</div>
     <div class="stamp"><div></div>
-    <div style="text-align:right">${today}.<br><b>로우리트콜렉티브 주식회사</b></div>
-    <div class="seal">LOWLIT<br>COLLECTIVE</div></div>
-    <div class="foot2">탄소 감축 기여량은 신재 원료 제품 대비 회피배출량으로, 로우리트 산정 방법론 v2.0(계수 출처 공개)에 따라 보수 기준으로 계산되었습니다. 본 인증서는 발급 대장에 기록되며 일련번호로 진위를 확인할 수 있습니다.</div>
-  </div><div class="terra"></div><div class="band"></div></div>`);
+    <div style="text-align:right">${today}.<br><b>로우리트콜렉티브 주식회사</b></div></div>
+    <div class="foot2">탄소 감축 기여량은 신재 원료 제품 대비 회피배출량으로, 전과정평가(LCA) 기반의 로우리트 산정 방법론 v2.0(ISO 14040/14044 원칙 · 계수 출처 공개)에 따라 보수 기준으로 계산되었습니다. 본 인증서는 발급 대장에 기록되며 일련번호로 진위를 확인할 수 있습니다.</div>
+  </div></div>`);
 }
 function printDoc(html){
   $('printArea').innerHTML=`<div style="max-width:640px;margin:0 auto">${html}</div>`;
@@ -1704,18 +1712,70 @@ $('apSubmit').onclick=async()=>{
   $('apSubmit').disabled=false;
 };
 
-/* ─────────── 공개: 탄소 계산기 ─────────── */
+/* ─────────── 공개: 탄소 계산기 + 감축 리포트 ─────────── */
 $('calcBtn').onclick=calc;
-function calc(){
+function calcVals(){
   const kg=Math.max(+$('ckg').value||0,0);
-  const [v,r]=EF[$('cm').value];
-  const virgin=kg*v,recycled=kg*r,std=kg*(v-r)*0.81,cons=kg*0.9*0.81;
-  $('cb1').style.width='72%';
-  $('cb2').style.width=Math.max(recycled/Math.max(virgin,0.001)*72,3)+'%';
-  $('cv1').textContent=fmt(virgin)+' kgCO₂e'; $('cv2').textContent=fmt(recycled)+' kgCO₂e';
-  $('cr1').textContent='−'+fmt(std)+' kgCO₂e'; $('cr2').textContent='−'+fmt(cons)+' kgCO₂e';
-  $('cr3').textContent='약 '+fmt(std/6.6)+'그루';
+  const matKey=$('cm').value, [v,r]=EF[matKey];
+  const matName={pe:'PE / LDPE',pp:'PP',hdpe:'HDPE'}[matKey];
+  const srcName={pe:'UK DEFRA 2024',pp:'APR/Franklin 2018',hdpe:'APR/Franklin 2018'}[matKey];
+  return {kg,matKey,matName,srcName,v,r,virgin:kg*v,recycled:kg*r,std:kg*(v-r)*0.81,cons:kg*0.9*0.81};
 }
+function calc(){
+  const c=calcVals();
+  $('cb1').style.width='72%';
+  $('cb2').style.width=Math.max(c.recycled/Math.max(c.virgin,0.001)*72,3)+'%';
+  $('cv1').textContent=fmt(c.virgin)+' kgCO₂e'; $('cv2').textContent=fmt(c.recycled)+' kgCO₂e';
+  $('cr1').textContent='−'+fmt(c.std)+' kgCO₂e'; $('cr2').textContent='−'+fmt(c.cons)+' kgCO₂e';
+  $('cr3').textContent='약 '+fmt(c.std/6.6)+'그루';
+}
+$('calcRptBtn').onclick=()=>{
+  const c=calcVals(); if(!c.kg){ alert('재생 원료 사용량(kg)을 입력해 주세요.'); return; }
+  const today=new Date().toISOString().slice(0,10);
+  const serial='LWL-CE-'+today.replace(/-/g,'').slice(2)+'-'+String(Date.now()%1000).padStart(3,'0');
+  const name=$('cName').value.trim(), proj=$('cProj').value.trim();
+  const w1=100, w2=Math.max(Math.round(c.recycled/Math.max(c.virgin,0.001)*100),3);
+  const efSrc = c.matKey==='pe'
+    ? 'UK Government GHG Conversion Factors 2024 (DEFRA/DESNZ, Material use)'
+    : 'Franklin Associates (2018), Life Cycle Impacts for Postconsumer Recycled Resins: PET, HDPE, and PP — APR 의뢰 LCA';
+  printDoc(`<div class="lc"><div class="band"></div><div class="body">
+    <div class="brand"><span><b>LOWLIT</b> COLLECTIVE · CARBON ESTIMATE</span><span class="serial2">No. ${serial}</span></div>
+    <h2>탄소 감축 리포트</h2><div class="en">RECYCLED MATERIAL CARBON ESTIMATE</div>
+    <dl style="border-top:none;padding-top:0;margin-bottom:6px">
+      ${name?`<dt>업체·브랜드</dt><dd><b>${esc(name)}</b></dd>`:''}
+      ${proj?`<dt>제품·프로젝트</dt><dd>${esc(proj)}</dd>`:''}
+      <dt>적용 재질</dt><dd>재생 ${esc(c.matName)} (post-consumer)</dd>
+      <dt>재생 원료 사용량</dt><dd class="num">${fmt(c.kg)} kg</dd>
+      <dt>발행일</dt><dd class="num">${today}</dd>
+    </dl>
+    <div class="heroNum"><span class="n">−${fmt(c.std)}</span> <span class="u">kgCO₂e</span></div>
+    <div class="heroLab">신재(새 플라스틱) 대신 재생 원료를 쓸 때 줄어드는 온실가스 (표준 시나리오 · GWP 100년 기준)</div>
+    <div class="impacts">
+      <div><div class="iv">−${fmt(c.cons)} kgCO₂e</div><div class="il">보수 시나리오 병기</div></div>
+      <div><div class="iv">약 ${fmt(c.std/6.6)}그루</div><div class="il">소나무 연간 흡수 환산</div></div>
+      <div><div class="iv">${Math.round((1-c.recycled/Math.max(c.virgin,0.001))*100)}%</div><div class="il">원료 단계 배출 감소율</div></div>
+    </div>
+    <div style="border:1px solid #e3e0d6;border-radius:10px;padding:14px 16px;margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:#4a5c53;margin-bottom:10px">원료 생산 단계 배출 비교 · 낮을수록 친환경</div>
+      <div style="font-size:11px;color:#4a5c53;margin-bottom:3px">신재 ${esc(c.matName)} 수지 생산 <b style="float:right">${fmt(c.virgin)} kgCO₂e</b></div>
+      <div style="height:14px;border-radius:6px;background:#c9c4b4;width:${w1}%;margin-bottom:10px"></div>
+      <div style="font-size:11px;color:#4a5c53;margin-bottom:3px">재생 ${esc(c.matName)} 원료 재생산 <b style="float:right;color:#2c5743">${fmt(c.recycled)} kgCO₂e</b></div>
+      <div style="height:14px;border-radius:6px;background:linear-gradient(90deg,#6fcf97,#2c5743);width:${w2}%"></div>
+    </div>
+    <table class="lcatable">
+      <tr><td>평가 방법</td><td>전과정평가(LCA) 기반 추정 — ISO 14040/14044 원칙 및 GHG Protocol Product Standard 참조</td></tr>
+      <tr><td>시스템 경계</td><td>원료 생산 단계(cradle-to-gate) 비교: 신재 수지 생산 vs 포스트컨슈머 재생 수지 재생산. 성형·가공, 수거·운송, 사용·폐기 단계는 양쪽 동일 조건으로 보아 제외</td></tr>
+      <tr><td>기능 단위</td><td>수지 원료 1 kg</td></tr>
+      <tr><td>배출계수</td><td>${esc(c.matName)} 신재 ${c.v} / 재생 ${c.r} kgCO₂e/kg — ${esc(efSrc)}</td></tr>
+      <tr><td>대체율 보정</td><td>재생원료의 신재 대체 품질 보정계수 0.81 적용 (과대산정 방지 가정)</td></tr>
+      <tr><td>보수 시나리오</td><td>환경성적표지(KEITI) 국내 계수 기반 — 순차이 ≈0.9 kgCO₂e/kg 일괄 적용</td></tr>
+      <tr><td>나무 환산</td><td>소나무 1그루 연간 CO₂ 흡수량 약 6.6 kg 기준 (커뮤니케이션용 참고 지표)</td></tr>
+    </table>
+    <div class="stamp"><div class="hint" style="max-width:340px">본 리포트는 원료 전환 효과의 사전 추정값입니다. 실제 제작 후에는 계량 로트 기반의 실측 리포트(납품 명세·기증확인서 연계)를 발행해 드립니다.</div>
+    <div style="text-align:right">${today.replace(/-/g,'. ')}.<br><b>로우리트콜렉티브 주식회사</b></div></div>
+    <div class="foot2">문의 business@lowlit.co · 전체 방법론·계수 테이블 공개: lowlit-impact.vercel.app/#/method · 본 추정값은 제3자 검증을 거친 인증 수치가 아니며, 원자재 산지·공정 조건에 따라 실제 값과 차이가 있을 수 있습니다.</div>
+  </div></div>`);
+};
 
 /* ─────────── 시작 ─────────── */
 calc(); renderHero(); route();
