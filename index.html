@@ -537,18 +537,23 @@
         <table class="method" id="cpEtable"></table>
         <div class="note">탄소 배출 감축량은 신재(버진) 원료 제품 대비 회피배출량이며, 보수/표준 두 시나리오를 병기합니다. 모든 수치는 실측 계량 로트에서 집계되었고 증빙(사진·계량 기록·기증확인서 일련번호)이 보관됩니다. 본 실적은 타 캠페인·EPR·플라스틱 크레딧에 중복 계상되지 않았습니다.</div>
       </div>
+      <div class="card" style="margin-bottom:14px" id="cpProdCard">
+        <div class="ctitle">2. 제품 구매·제작 성과 <span class="more">로우리트 제품·커스텀 제작 — 재생소재 사용 기준</span></div>
+        <table id="cpProd"></table>
+        <div class="note" id="cpProdNote"></div>
+      </div>
       <div class="two" style="margin-bottom:14px">
         <div class="card">
-          <div class="ctitle">2. 참여 성과</div>
+          <div class="ctitle">3. 참여 성과</div>
           <table id="cpPart"></table>
         </div>
         <div class="card">
-          <div class="ctitle">3. 수거 로트 명세</div>
+          <div class="ctitle">4. 수거 로트 명세</div>
           <div style="max-height:220px;overflow-y:auto"><table id="cpLots"></table></div>
         </div>
       </div>
       <div class="card" style="margin-bottom:14px">
-        <div class="ctitle">4. 자원 행선지</div>
+        <div class="ctitle">5. 자원 행선지</div>
         <div class="flow">
           <span class="n">수거·계량</span><span class="a">→</span>
           <span class="n">분류·세척</span><span class="a">→</span>
@@ -559,7 +564,7 @@
         <div class="note">공정 잔여물은 Tier 3(복합재·건축자재) 경로로 처리되어 매립·소각을 회피합니다.</div>
       </div>
       <div class="card">
-        <div class="ctitle">5. 공시 인용 표준 문안 <span class="more">지속가능경영보고서 · 사내 보고 · 보도자료용</span></div>
+        <div class="ctitle">6. 공시 인용 표준 문안 <span class="more">지속가능경영보고서 · 사내 보고 · 보도자료용</span></div>
         <div class="msg" id="cpQuote"></div>
       </div>
     </section>
@@ -1068,6 +1073,7 @@ function pupd(){
 /* ─────────── 캠페인 리포트 (/c/아이디 또는 예시) ─────────── */
 const DEMO_CAMPAIGN={ id:'C-2607', name:'임직원 자원순환 캠페인 (예시)', org:'○○전자', period:'2026년 6~7월',
   target:300, participants:438, times:1204, sites:3, total:312, goods:1200, goodsName:'재생 플라스틱 키링',
+  items:[{name:'재생 플라스틱 키링',qty:1200,g:8},{name:'캐피블럭 (라운지)',qty:10,g:3050}],
   lots:[{d:'2026-07-09',mat:'PP',kg:48.7},{d:'2026-07-02',mat:'PE/LDPE',kg:36.2},{d:'2026-06-25',mat:'PP',kg:52.4},
         {d:'2026-06-18',mat:'PE/LDPE',kg:61},{d:'2026-06-11',mat:'PP',kg:57.3},{d:'2026-06-04',mat:'HDPE',kg:56.4}] };
 async function renderCampaignPage(cid,demo){
@@ -1115,14 +1121,25 @@ async function renderCampaignPage(cid,demo){
      ['참여 사업장',C.sites?C.sites+' 개':'—'],
      ['1인당 평균 수거량',perHead?fmt(perHead)+' kg/명':'—']]
     .map(r=>`<tr><td>${r[0]}</td><td class="num" style="text-align:right">${r[1]}</td></tr>`).join('');
-  // 3. 로트 명세
+  // 2. 제품 구매·제작 성과
+  const items=C.items||[];
+  const prodKg=items.reduce((s,x)=>s+(x.qty*x.g/1000),0);
+  const prodCons=prodKg*0.9*0.81, prodStd=prodKg*1.87*0.81;
+  if(items.length){
+    $('cpProdCard').style.display='';
+    $('cpProd').innerHTML='<tr><th>제품</th><th style="text-align:right">수량</th><th style="text-align:right">개당 재생소재 (g)</th><th style="text-align:right">재생소재 (kg)</th></tr>'+
+      items.map(x=>`<tr><td>${esc(x.name)}</td><td class="num" style="text-align:right">${fmt(x.qty)}</td><td class="num" style="text-align:right">${fmt(x.g)}</td><td class="num" style="text-align:right">${fmt(x.qty*x.g/1000)}</td></tr>`).join('')+
+      `<tr><td><b>합계</b></td><td></td><td></td><td class="num" style="text-align:right"><b>${fmt(prodKg)}</b></td></tr>`;
+    $('cpProdNote').innerHTML=`신재 원료 제품 대비 온실가스 감축량 <b>−${fmt(prodCons)} ~ −${fmt(prodStd)} kgCO₂e</b> (보수~표준 · PE/LDPE 계수 · 대체율 0.81 · 방법론 v2.0)`;
+  } else $('cpProdCard').style.display='none';
+  // 4. 로트 명세
   const lots=C.lots||[];
   $('cpLots').innerHTML='<tr><th>일자</th><th>재질</th><th style="text-align:right">kg</th></tr>'+
     (lots.length?lots.map(l=>`<tr><td class="num">${esc(l.d)}</td><td>${esc(l.mat)}</td><td class="num" style="text-align:right">${fmt(l.kg)}</td></tr>`).join(''):'<tr><td colspan="3" style="color:var(--ink2)">아직 귀속된 로트가 없습니다</td></tr>');
   // 4. 행선지
   $('cpGoodsFlow').textContent=C.goods?((C.goodsName||'업사이클링 제품')+' '+fmt(C.goods)+'개 제작'):'업사이클링 제품 제작';
   // 5. 문안
-  $('cpQuote').textContent=`당사는 ${C.period||''} 로우리트콜렉티브와 함께한 「${(C.name||'').replace(' (예시)','')}」을 통해 폐플라스틱 ${fmt(kg)}kg을 수거·재자원화하였으며, 이를 통해 약 ${(kg*CO2/1000).toFixed(3)}tCO₂eq(보수 기준, 표준 기준 ${(kg*CO2STD/1000).toFixed(3)}tCO₂eq)의 온실가스 감축에 기여하였습니다.${C.goods?` 수거된 자원은 ${C.goodsName||'업사이클링 제품'} ${fmt(C.goods)}개로 제작되어 임직원에게 환원되었습니다.`:''}
+  $('cpQuote').textContent=`당사는 ${C.period||''} 로우리트콜렉티브와 함께한 「${(C.name||'').replace(' (예시)','')}」을 통해 폐플라스틱 ${fmt(kg)}kg을 수거·재자원화하였으며, 이를 통해 약 ${(kg*CO2/1000).toFixed(3)}tCO₂eq(보수 기준, 표준 기준 ${(kg*CO2STD/1000).toFixed(3)}tCO₂eq)의 온실가스 감축에 기여하였습니다.${C.goods?` 수거된 자원은 ${C.goodsName||'업사이클링 제품'} ${fmt(C.goods)}개로 제작되어 임직원에게 환원되었습니다.`:''}${prodKg?` 또한 재생 플라스틱 제품 도입으로 재생소재 ${fmt(prodKg)}kg을 사용, 신재 대비 약 ${fmt(prodCons)}~${fmt(prodStd)}kgCO₂e의 추가 감축에 기여하였습니다.`:''}
 ※ 산정 기준: 로우리트 임팩트 원장 산정 방법론 v2.0 (신재 원료 대비 회피배출량 · 계수 출처 공개) · 실측 계량 로트 · 타 실적 중복 계상 없음 (리포트 No. LWL-CR-${C.id.replace(/^C-?/,'')}-001)`;
   $('cpCsvBtn').onclick=()=>downloadCSV(C.id+'_성과데이터.csv',
     [['구분','지표','값','단위','산정 기준'],...eRows,[],['로트 명세'],['일자','재질','kg'],...lots.map(l=>[l.d,l.mat,l.kg])]);
@@ -1154,11 +1171,18 @@ async function campaignDoc(C,demo,eRows){
       <div><div class="iv">약 ${fmt(Math.round(kg*CAPS))}개</div><div class="il">병뚜껑 환산 (kg×400)</div></div>
       ${C.goods?`<div><div class="iv">${fmt(C.goods)}개</div><div class="il">${esc(C.goodsName||'업사이클링 제품')} 생산</div></div>`:''}
     </div>
-    <h4>환경(E) 정량 성과 지표</h4>
+    <h4>① 수거 성과 — 환경(E) 정량 지표</h4>
     <table class="lcatable">
       <tr><th>구분</th><th>지표</th><th style="text-align:right">값</th><th>단위</th></tr>
       ${eRows.map(r=>`<tr><td>${r[0]}</td><td style="font-weight:400;color:inherit">${r[1]}</td><td style="text-align:right;font-weight:700">${r[2]}</td><td style="font-weight:400;color:inherit">${r[3]}</td></tr>`).join('')}
     </table>
+    ${(C.items&&C.items.length)?`<h4>② 제품 구매·제작 성과 — 재생소재 사용</h4>
+    <table class="lcatable">
+      <tr><th>제품</th><th style="text-align:right">수량</th><th style="text-align:right">개당 재생소재(g)</th><th style="text-align:right">재생소재(kg)</th></tr>
+      ${C.items.map(x=>`<tr><td style="font-weight:400;color:inherit">${esc(x.name)}</td><td class="num" style="text-align:right">${fmt(x.qty)}</td><td class="num" style="text-align:right">${fmt(x.g)}</td><td class="num" style="text-align:right">${fmt(x.qty*x.g/1000)}</td></tr>`).join('')}
+      <tr><td style="font-weight:700">합계</td><td></td><td></td><td class="num" style="text-align:right;font-weight:700">${fmt(C.items.reduce((s,x)=>s+x.qty*x.g/1000,0))}</td></tr>
+    </table>
+    <div class="hint" style="margin-bottom:12px">신재 원료 제품 대비 온실가스 감축량: <b>−${fmt(C.items.reduce((s,x)=>s+x.qty*x.g/1000,0)*0.9*0.81)} ~ −${fmt(C.items.reduce((s,x)=>s+x.qty*x.g/1000,0)*1.87*0.81)} kgCO₂e</b> (보수~표준 · PE/LDPE 계수 · 대체율 0.81)</div>`:''}
     <div class="foot2">각 지표의 산정 기준·계수 출처는 2면 부록 참조 · 본 실적은 타 캠페인·EPR·플라스틱 크레딧에 중복 계상되지 않았습니다.</div>
   </div></div>
   <div class="pagebreak"></div>
@@ -1806,6 +1830,9 @@ function campaignForm(c){
     <div class="frow"><label>사업장 수</label><input type="number" id="cfSites" value="${c?.sites||''}"></div>
     <div class="frow"><label>제작 제품명</label><input id="cfGoodsName" value="${esc(c?.goodsName||'')}" placeholder="예: 재생 플라스틱 키링"></div>
     <div class="frow"><label>제작 수량 (개)</label><input type="number" id="cfGoods" value="${c?.goods||''}"></div>
+    <div class="frow"><label>제품 납품·제작 내역 (선택)</label>
+      <textarea id="cfItems" rows="3" placeholder="한 줄에 하나 — 제품명, 수량, 개당 재생소재(g)&#10;예: 캐피블럭, 10, 3050">${(c?.items||[]).map(x=>x.name+', '+x.qty+', '+x.g).join('\n')}</textarea>
+      <div class="hint">렌탈·제작으로 공급한 제품 실적 — 리포트의 "제품 구매·제작 성과"에 반영됩니다</div></div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn o" onclick="closeModal()">취소</button>
       <button class="btn" id="cfSave">저장</button>
@@ -1813,9 +1840,11 @@ function campaignForm(c){
   $('cfSave').onclick=async()=>{
     const id=isNew?$('cfId').value.trim():c.id, name=$('cfName').value.trim();
     if(!id||!name){alert('ID와 캠페인명을 입력하세요');return;}
+    const items=$('cfItems').value.split('\n').map(l=>l.split(',').map(s=>s.trim())).filter(a=>a[0]&&+a[1]&&+a[2])
+      .map(a=>({name:a[0],qty:+a[1],g:+a[2]}));
     const data={name,org:$('cfOrg').value.trim(),period:$('cfPeriod').value.trim(),
       target:+$('cfTarget').value||0,participants:+$('cfPart').value||0,times:+$('cfTimes').value||0,sites:+$('cfSites').value||0,
-      goodsName:$('cfGoodsName').value.trim(),goods:+$('cfGoods').value||0};
+      goodsName:$('cfGoodsName').value.trim(),goods:+$('cfGoods').value||0,items};
     try{
       if(isNew) await setDoc(doc(db,'campaigns',id),{...data,total:0,lots:[],created:Date.now()});
       else await updateDoc(doc(db,'campaigns',id),data);
